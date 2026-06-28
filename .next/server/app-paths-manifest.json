@@ -1,0 +1,22 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/api/search/route": "app/api/search/route.js",
+  "/biblioteca/page": "app/biblioteca/page.js",
+  "/categorias/[slug]/page": "app/categorias/[slug]/page.js",
+  "/desarrollador/page": "app/desarrollador/page.js",
+  "/legal/privacidad/page": "app/legal/privacidad/page.js",
+  "/legal/terminos/page": "app/legal/terminos/page.js",
+  "/login/page": "app/login/page.js",
+  "/moderacion/page": "app/moderacion/page.js",
+  "/moderacion/prompts/[slug]/page": "app/moderacion/prompts/[slug]/page.js",
+  "/page": "app/page.js",
+  "/perfil/page": "app/perfil/page.js",
+  "/prompts/[slug]/editar/page": "app/prompts/[slug]/editar/page.js",
+  "/prompts/[slug]/page": "app/prompts/[slug]/page.js",
+  "/prompts/page": "app/prompts/page.js",
+  "/quienes-somos/page": "app/quienes-somos/page.js",
+  "/registro/page": "app/registro/page.js",
+  "/subir/page": "app/subir/page.js"
+}

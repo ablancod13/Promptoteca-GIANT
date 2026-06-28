@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.vercel/
+dist/
+
+server.cmd.log
+server.combined.log
+supabase/.temp/
+
+.env
+.env.local
+.env.production

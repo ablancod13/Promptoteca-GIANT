@@ -1,0 +1,174 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/categorias/[slug]",
+      "regex": "^/categorias/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/categorias/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/moderacion/prompts/[slug]",
+      "regex": "^/moderacion/prompts/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/moderacion/prompts/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/prompts/[slug]",
+      "regex": "^/prompts/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/prompts/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/prompts/[slug]/editar",
+      "regex": "^/prompts/([^/]+?)/editar(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/prompts/(?<nxtPslug>[^/]+?)/editar(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/api/search",
+      "regex": "^/api/search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/search(?:/)?$"
+    },
+    {
+      "page": "/biblioteca",
+      "regex": "^/biblioteca(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/biblioteca(?:/)?$"
+    },
+    {
+      "page": "/desarrollador",
+      "regex": "^/desarrollador(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/desarrollador(?:/)?$"
+    },
+    {
+      "page": "/legal/privacidad",
+      "regex": "^/legal/privacidad(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/legal/privacidad(?:/)?$"
+    },
+    {
+      "page": "/legal/terminos",
+      "regex": "^/legal/terminos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/legal/terminos(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/moderacion",
+      "regex": "^/moderacion(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/moderacion(?:/)?$"
+    },
+    {
+      "page": "/perfil",
+      "regex": "^/perfil(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/perfil(?:/)?$"
+    },
+    {
+      "page": "/prompts",
+      "regex": "^/prompts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/prompts(?:/)?$"
+    },
+    {
+      "page": "/quienes-somos",
+      "regex": "^/quienes\\-somos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/quienes\\-somos(?:/)?$"
+    },
+    {
+      "page": "/registro",
+      "regex": "^/registro(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/registro(?:/)?$"
+    },
+    {
+      "page": "/subir",
+      "regex": "^/subir(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/subir(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

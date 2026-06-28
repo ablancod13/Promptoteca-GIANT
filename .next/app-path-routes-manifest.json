@@ -1,0 +1,22 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/admin/page": "/admin",
+  "/api/search/route": "/api/search",
+  "/biblioteca/page": "/biblioteca",
+  "/categorias/[slug]/page": "/categorias/[slug]",
+  "/desarrollador/page": "/desarrollador",
+  "/legal/privacidad/page": "/legal/privacidad",
+  "/legal/terminos/page": "/legal/terminos",
+  "/login/page": "/login",
+  "/moderacion/page": "/moderacion",
+  "/moderacion/prompts/[slug]/page": "/moderacion/prompts/[slug]",
+  "/page": "/",
+  "/perfil/page": "/perfil",
+  "/prompts/[slug]/editar/page": "/prompts/[slug]/editar",
+  "/prompts/[slug]/page": "/prompts/[slug]",
+  "/prompts/page": "/prompts",
+  "/quienes-somos/page": "/quienes-somos",
+  "/registro/page": "/registro",
+  "/subir/page": "/subir"
+}
