@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/prompts/[slug]/page": {
-          "moduleId": 20789,
+          "moduleId": 94189,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -11,6 +11,90 @@
       },
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
+    },
+    "4040b50584c929a78a855a82229984eb0bb0034bc9": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "getPromptInteractionStateAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "getPromptInteractionStateAction",
+      "filename": "src/app/prompts/actions.ts"
+    },
+    "40bba502030833bfe0e4e0aac347f4f1924e3ce4c1": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "registerPromptCopyAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "registerPromptCopyAction",
+      "filename": "src/app/prompts/actions.ts"
+    },
+    "40dbeedd025bcfd5f30338482c1f54b3907b75d676": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "registerTemplateUseAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "registerTemplateUseAction",
+      "filename": "src/app/prompts/actions.ts"
+    },
+    "4019623c6485537adacb95a28ae00aa5f5bd21b953": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "togglePromptFavoriteAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "togglePromptFavoriteAction",
+      "filename": "src/app/prompts/actions.ts"
+    },
+    "404290a3be575ffa11defbfb33579a5fd9a9f7858d": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "togglePromptLikeAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "togglePromptLikeAction",
+      "filename": "src/app/prompts/actions.ts"
+    },
+    "60a80f439be6426e23e0659c3ed31e439ecc60cb23": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "updatePromptStatsAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "updatePromptStatsAction",
+      "filename": "src/app/prompts/actions.ts"
+    },
+    "7881e335693995eb8ee03993f8f2a0a2e59e61f5dd": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "saveTemplateVersionAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "saveTemplateVersionAction",
+      "filename": "src/app/biblioteca/actions.ts"
     }
   },
   "edge": {}

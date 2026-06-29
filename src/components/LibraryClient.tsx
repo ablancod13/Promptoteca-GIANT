@@ -1,86 +1,67 @@
 "use client";
 
-import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { Edit3, Eye, Folder, FolderOpen, HeartOff, Plus, Save, Trash2 } from "lucide-react";
+import {
+  createLibraryFolderAction,
+  getLibraryStateAction,
+  moveFavoriteToFolderAction,
+  removeLibraryFavoriteAction,
+  removeLibraryLikeAction,
+  savePrivateNoteAction,
+  savePrivatePromptVersionAction,
+  updateLibraryFolderColorAction,
+  type LibraryFolder,
+  type LibraryPrivateVersion,
+  type LibraryState
+} from "@/app/biblioteca/actions";
 import type { Prompt } from "@/lib/types";
-
-interface PrivateFolder {
-  id: string;
-  name: string;
-}
-
-interface SavedVersion {
-  id: string;
-  promptId: string;
-  title: string;
-  text: string;
-  createdAt: string;
-}
 
 type FolderMap = Record<string, string>;
 type FolderColorMap = Record<string, string>;
 type NotesMap = Record<string, string>;
 type VersionMap = Record<string, string>;
 
-const FAVORITES_KEY = "giant_favorites";
-const LIKES_KEY = "giant_likes";
-const FOLDERS_KEY = "giant_private_folders";
-const FOLDER_COLORS_KEY = "giant_private_folder_colors";
-const FOLDER_MAP_KEY = "giant_favorite_folders";
-const NOTES_KEY = "giant_private_notes";
-const PRIVATE_VERSIONS_KEY = "giant_private_prompt_edits";
 const UNFILED_ID = "sin-carpeta";
 const FOLDER_COLORS = ["#017F88", "#EC490D", "#2563EB", "#16A34A", "#DC2626", "#7C3AED", "#CA8A04", "#475569"];
+
+const EMPTY_LIBRARY: LibraryState = {
+  favoriteIds: [],
+  likedIds: [],
+  folders: [],
+  favoriteFolders: {},
+  notes: {},
+  privateVersions: {},
+  savedTemplateVersions: []
+};
 
 export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [likedIds, setLikedIds] = useState<string[]>([]);
-  const [folders, setFolders] = useState<PrivateFolder[]>([]);
+  const [folders, setFolders] = useState<LibraryFolder[]>([]);
   const [folderColors, setFolderColors] = useState<FolderColorMap>({});
   const [folderMap, setFolderMap] = useState<FolderMap>({});
   const [notes, setNotes] = useState<NotesMap>({});
   const [privateVersions, setPrivateVersions] = useState<VersionMap>({});
-  const [savedTemplateVersions, setSavedTemplateVersions] = useState<SavedVersion[]>([]);
+  const [savedTemplateVersions, setSavedTemplateVersions] = useState<LibraryPrivateVersion[]>([]);
   const [newFolder, setNewFolder] = useState("");
   const [editingPromptId, setEditingPromptId] = useState<string | null>(null);
   const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
   const [activeFolderId, setActiveFolderId] = useState<string>(UNFILED_ID);
   const [draggingPromptId, setDraggingPromptId] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const favorites = window.localStorage.getItem(FAVORITES_KEY);
-    const likes = window.localStorage.getItem(LIKES_KEY);
-    const storedFolders = window.localStorage.getItem(FOLDERS_KEY);
-    const storedFolderColors = window.localStorage.getItem(FOLDER_COLORS_KEY);
-    const storedFolderMap = window.localStorage.getItem(FOLDER_MAP_KEY);
-    const storedNotes = window.localStorage.getItem(NOTES_KEY);
-    const storedPrivateVersions = window.localStorage.getItem(PRIVATE_VERSIONS_KEY);
-    const customVersions = window.localStorage.getItem("giant_custom_versions");
-    const defaultFolders = [
-      { id: "lectura", name: "Lectura crítica" },
-      { id: "proa", name: "PROA" }
-    ];
-
-    setFavoriteIds(favorites ? (JSON.parse(favorites) as string[]) : []);
-    setLikedIds(likes ? (JSON.parse(likes) as string[]) : []);
-    setFolders(
-      (storedFolders ? (JSON.parse(storedFolders) as PrivateFolder[]) : defaultFolders).filter(
-        (folder) => folder.id !== UNFILED_ID
-      )
-    );
-    setFolderColors(
-      storedFolderColors
-        ? (JSON.parse(storedFolderColors) as FolderColorMap)
-        : {
-            lectura: "#017F88",
-            proa: "#EC490D"
-          }
-    );
-    setFolderMap(storedFolderMap ? (JSON.parse(storedFolderMap) as FolderMap) : {});
-    setNotes(storedNotes ? (JSON.parse(storedNotes) as NotesMap) : {});
-    setPrivateVersions(storedPrivateVersions ? (JSON.parse(storedPrivateVersions) as VersionMap) : {});
-    setSavedTemplateVersions(customVersions ? (JSON.parse(customVersions) as SavedVersion[]) : []);
+    let cancelled = false;
+    getLibraryStateAction().then((state) => {
+      if (cancelled) return;
+      applyLibraryState(state);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const favorites = useMemo(() => prompts.filter((prompt) => favoriteIds.includes(prompt.id)), [favoriteIds, prompts]);
@@ -88,61 +69,55 @@ export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
   const activePrompts = favorites.filter((prompt) => (folderMap[prompt.id] ?? UNFILED_ID) === activeFolderId);
   const unfiledCount = favorites.filter((prompt) => (folderMap[prompt.id] ?? UNFILED_ID) === UNFILED_ID).length;
 
-  function persistFolders(next: PrivateFolder[]) {
-    setFolders(next);
-    window.localStorage.setItem(FOLDERS_KEY, JSON.stringify(next));
+  function applyLibraryState(state: LibraryState = EMPTY_LIBRARY) {
+    setFavoriteIds(state.favoriteIds);
+    setLikedIds(state.likedIds);
+    setFolders(state.folders);
+    setFolderColors(Object.fromEntries(state.folders.map((folder) => [folder.id, folder.color])));
+    setFolderMap(state.favoriteFolders);
+    setNotes(state.notes);
+    setPrivateVersions(state.privateVersions);
+    setSavedTemplateVersions(state.savedTemplateVersions);
   }
 
-  function persistFolderMap(next: FolderMap) {
-    setFolderMap(next);
-    window.localStorage.setItem(FOLDER_MAP_KEY, JSON.stringify(next));
-  }
-
-  function persistFolderColors(next: FolderColorMap) {
-    setFolderColors(next);
-    window.localStorage.setItem(FOLDER_COLORS_KEY, JSON.stringify(next));
-  }
-
-  function persistNotes(next: NotesMap) {
-    setNotes(next);
-    window.localStorage.setItem(NOTES_KEY, JSON.stringify(next));
-  }
-
-  function persistPrivateVersions(next: VersionMap) {
-    setPrivateVersions(next);
-    window.localStorage.setItem(PRIVATE_VERSIONS_KEY, JSON.stringify(next));
+  function runLibraryAction(action: () => Promise<{ ok: boolean; message: string; state?: LibraryState }>) {
+    startTransition(async () => {
+      const result = await action();
+      setMessage(result.message);
+      if (result.ok && result.state) applyLibraryState(result.state);
+    });
   }
 
   function createFolder() {
     const name = newFolder.trim().slice(0, 42);
     if (!name) return;
-    const folder = { id: `folder-${Date.now()}`, name };
-    persistFolders([...folders, folder]);
-    persistFolderColors({ ...folderColors, [folder.id]: FOLDER_COLORS[folders.length % FOLDER_COLORS.length] });
-    setActiveFolderId(folder.id);
-    setNewFolder("");
+    const color = FOLDER_COLORS[folders.length % FOLDER_COLORS.length];
+    runLibraryAction(async () => {
+      const result = await createLibraryFolderAction(name, color);
+      if (result.ok) {
+        setNewFolder("");
+        const created = result.state.folders.find((folder) => folder.name === name);
+        if (created) setActiveFolderId(created.id);
+      }
+      return result;
+    });
   }
 
   function removeFavorite(promptId: string) {
-    const next = favoriteIds.filter((id) => id !== promptId);
-    setFavoriteIds(next);
-    window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
-    const nextMap = { ...folderMap };
-    delete nextMap[promptId];
-    persistFolderMap(nextMap);
+    runLibraryAction(() => removeLibraryFavoriteAction(promptId));
   }
 
   function removeLike(promptId: string) {
-    const next = likedIds.filter((id) => id !== promptId);
-    setLikedIds(next);
-    window.localStorage.setItem(LIKES_KEY, JSON.stringify(next));
+    runLibraryAction(() => removeLibraryLikeAction(promptId));
   }
 
   function movePrompt(promptId: string, folderId: string) {
     if (!promptId) return;
-    persistFolderMap({ ...folderMap, [promptId]: folderId });
+    const nextFolderId = folderId === UNFILED_ID ? null : folderId;
+    setFolderMap((current) => ({ ...current, [promptId]: folderId }));
     setActiveFolderId(folderId);
     setDraggingPromptId(null);
+    runLibraryAction(() => moveFavoriteToFolderAction(promptId, nextFolderId));
   }
 
   function startPromptDrag(event: React.DragEvent<HTMLElement>, prompt: Prompt) {
@@ -159,12 +134,24 @@ export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
   }
 
   function saveNote(promptId: string, value: string) {
-    persistNotes({ ...notes, [promptId]: value.slice(0, 144) });
+    const nextValue = value.slice(0, 144);
+    setNotes((current) => ({ ...current, [promptId]: nextValue }));
   }
 
-  function savePrivateVersion(promptId: string, value: string) {
-    persistPrivateVersions({ ...privateVersions, [promptId]: value });
+  function persistNote(promptId: string) {
+    runLibraryAction(() => savePrivateNoteAction(promptId, notes[promptId] ?? ""));
+  }
+
+  function savePrivateVersion(prompt: Prompt, value: string) {
+    const nextValue = value.trim();
+    setPrivateVersions((current) => ({ ...current, [prompt.id]: nextValue }));
     setEditingPromptId(null);
+    runLibraryAction(() => savePrivatePromptVersionAction(prompt.id, prompt.title, nextValue));
+  }
+
+  function changeFolderColor(folderId: string, color: string) {
+    setFolderColors((current) => ({ ...current, [folderId]: color }));
+    runLibraryAction(() => updateLibraryFolderColorAction(folderId, color));
   }
 
   function renderPromptCard(prompt: Prompt) {
@@ -195,6 +182,7 @@ export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
             maxLength={144}
             value={notes[prompt.id] ?? ""}
             onChange={(event) => saveNote(prompt.id, event.target.value)}
+            onBlur={() => persistNote(prompt.id)}
             placeholder="Nota solo visible para ti"
           />
         </label>
@@ -204,7 +192,7 @@ export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
             <textarea
               className="textarea private-edit"
               defaultValue={versionText}
-              onBlur={(event) => savePrivateVersion(prompt.id, event.target.value)}
+              onBlur={(event) => savePrivateVersion(prompt, event.target.value)}
             />
           </label>
         ) : privateVersions[prompt.id] ? (
@@ -265,14 +253,15 @@ export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
       <section className="table-panel stack">
         <div className="section-head compact">
           <h2>Carpetas privadas</h2>
-          <span className="badge">Arrastra fichas</span>
+          <span className="badge">{isPending ? "Guardando..." : "Arrastra fichas"}</span>
         </div>
         <div className="action-row">
           <input className="input" value={newFolder} onChange={(event) => setNewFolder(event.target.value)} placeholder="Nueva carpeta" />
-          <button className="button primary" type="button" onClick={createFolder}>
+          <button className="button primary" type="button" onClick={createFolder} disabled={isPending}>
             <Plus size={16} /> Crear
           </button>
         </div>
+        {message ? <div className="callout">{message}</div> : null}
         <div className="folder-shelf">
           <FolderTile
             id={UNFILED_ID}
@@ -290,7 +279,7 @@ export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
               name={folder.name}
               count={favorites.filter((prompt) => folderMap[prompt.id] === folder.id).length}
               active={activeFolderId === folder.id}
-              color={folderColors[folder.id] ?? FOLDER_COLORS[0]}
+              color={folderColors[folder.id] ?? folder.color ?? FOLDER_COLORS[0]}
               isDragging={Boolean(draggingPromptId)}
               onOpen={setActiveFolderId}
               onMove={movePrompt}
@@ -316,7 +305,7 @@ export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
                   key={color}
                   type="button"
                   title="Cambiar color"
-                  onClick={() => persistFolderColors({ ...folderColors, [activeFolderId]: color })}
+                  onClick={() => changeFolderColor(activeFolderId, color)}
                 />
               ))}
             </div>
@@ -329,6 +318,7 @@ export function LibraryClient({ prompts }: { prompts: Prompt[] }) {
             {savedTemplateVersions.map((version) => (
               <article className="callout" key={version.id}>
                 <strong>{version.title}</strong>
+                <span className="muted">{new Date(version.createdAt).toLocaleDateString("es-ES")}</span>
                 <button className="button secondary" type="button">
                   <Save size={16} /> Guardada
                 </button>

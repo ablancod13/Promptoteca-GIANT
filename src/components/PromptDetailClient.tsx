@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Clipboard, Flag, Heart, Lock, PenLine, Star } from "lucide-react";
+import {
+  getPromptInteractionStateAction,
+  registerPromptCopyAction,
+  registerTemplateUseAction,
+  togglePromptFavoriteAction,
+  togglePromptLikeAction,
+  updatePromptStatsAction,
+  type PromptStatsSnapshot
+} from "@/app/prompts/actions";
 import { buildCcByCitation, getLicenseUrl } from "@/lib/license";
 import { trackAnalyticsEvent } from "@/lib/analytics";
-import { awardLocalXp, canDevelop, getLocalUser } from "@/lib/local-user";
-import { getLocalPromptStats, incrementLocalCopy, notifyStatsUpdated, updateManualPromptStat, type LocalPromptStats } from "@/lib/local-stats";
+import { canDevelop, getLocalUser } from "@/lib/local-user";
 import type { Prompt } from "@/lib/types";
 import { TemplateWizard } from "@/components/TemplateWizard";
 
@@ -18,7 +26,8 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
   const [liked, setLiked] = useState(false);
   const [favorited, setFavorited] = useState(false);
   const [developerMode, setDeveloperMode] = useState(false);
-  const [stats, setStats] = useState<LocalPromptStats>({
+  const [isPending, startTransition] = useTransition();
+  const [stats, setStats] = useState<PromptStatsSnapshot>({
     likes: prompt.likes,
     favorites: prompt.favorites,
     copies: prompt.copies,
@@ -26,15 +35,24 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
   });
 
   useEffect(() => {
+    let cancelled = false;
     const user = getLocalUser();
     const registered = Boolean(user);
     setIsRegistered(registered);
     setDeveloperMode(canDevelop(user));
-    const likes = window.localStorage.getItem("giant_likes");
-    const favorites = window.localStorage.getItem("giant_favorites");
-    setLiked(likes ? (JSON.parse(likes) as string[]).includes(prompt.id) : false);
-    setFavorited(favorites ? (JSON.parse(favorites) as string[]).includes(prompt.id) : false);
-    setStats(getLocalPromptStats(prompt));
+    setStats({
+      likes: prompt.likes,
+      favorites: prompt.favorites,
+      copies: prompt.copies,
+      templateUses: prompt.templateUses
+    });
+
+    getPromptInteractionStateAction(prompt.id).then((state) => {
+      if (cancelled) return;
+      setLiked(state.liked);
+      setFavorited(state.favorited);
+      setStats(state.stats);
+    });
 
     if (!registered) {
       const opened = window.localStorage.getItem("giant_first_prompt_opened");
@@ -48,25 +66,23 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
 
     void trackAnalyticsEvent({ type: "apertura_prompt", promptId: prompt.id });
 
-    const refreshStats = () => setStats(getLocalPromptStats(prompt));
-    window.addEventListener("giant:prompt-stats-updated", refreshStats);
-    window.addEventListener("storage", refreshStats);
     return () => {
-      window.removeEventListener("giant:prompt-stats-updated", refreshStats);
-      window.removeEventListener("storage", refreshStats);
+      cancelled = true;
     };
-  }, [prompt.id, prompt.slug]);
+  }, [prompt.id, prompt.slug, prompt.favorites, prompt.likes, prompt.copies, prompt.templateUses]);
 
   async function copyPrompt() {
     if (!isRegistered) {
       setMessage("Para copiar prompts debes iniciar sesión o crear una cuenta.");
       return;
     }
+
     await navigator.clipboard.writeText(prompt.content);
-    incrementLocalCopy(prompt.id);
-    setStats(getLocalPromptStats(prompt));
-    setMessage("Prompt copiado.");
-    awardLocalXp(`copy:${prompt.id}`, 2);
+    startTransition(async () => {
+      const result = await registerPromptCopyAction(prompt.id);
+      setMessage(result.message);
+      if (result.ok) setStats(result.state.stats);
+    });
     void trackAnalyticsEvent({ type: "copia_prompt", promptId: prompt.id });
   }
 
@@ -75,21 +91,15 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
       setMessage("Para guardar favoritos debes iniciar sesión o crear una cuenta.");
       return;
     }
-    const existing = window.localStorage.getItem("giant_favorites");
-    const favorites = new Set(existing ? (JSON.parse(existing) as string[]) : []);
-    if (favorites.has(prompt.id)) {
-      favorites.delete(prompt.id);
-      setFavorited(false);
-      setMessage("Eliminado de favoritos.");
-    } else {
-      favorites.add(prompt.id);
-      setFavorited(true);
-      setMessage("Guardado en favoritos.");
-      awardLocalXp(`favorite:${prompt.id}`, 1);
-    }
-    window.localStorage.setItem("giant_favorites", JSON.stringify(Array.from(favorites)));
-    notifyStatsUpdated();
-    setStats(getLocalPromptStats(prompt));
+
+    startTransition(async () => {
+      const result = await togglePromptFavoriteAction(prompt.id);
+      setMessage(result.message);
+      if (result.ok) {
+        setFavorited(result.state.favorited);
+        setStats(result.state.stats);
+      }
+    });
     void trackAnalyticsEvent({ type: "favorito", promptId: prompt.id });
   }
 
@@ -98,22 +108,30 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
       setMessage("Para dar me gusta debes iniciar sesión o crear una cuenta.");
       return;
     }
-    const existing = window.localStorage.getItem("giant_likes");
-    const likes = new Set(existing ? (JSON.parse(existing) as string[]) : []);
-    if (likes.has(prompt.id)) {
-      likes.delete(prompt.id);
-      setLiked(false);
-      setMessage("Me gusta eliminado.");
-    } else {
-      likes.add(prompt.id);
-      setLiked(true);
-      setMessage("Me gusta registrado.");
-      awardLocalXp(`like:${prompt.id}`, 1);
-    }
-    window.localStorage.setItem("giant_likes", JSON.stringify(Array.from(likes)));
-    notifyStatsUpdated();
-    setStats(getLocalPromptStats(prompt));
+
+    startTransition(async () => {
+      const result = await togglePromptLikeAction(prompt.id);
+      setMessage(result.message);
+      if (result.ok) {
+        setLiked(result.state.liked);
+        setStats(result.state.stats);
+      }
+    });
     void trackAnalyticsEvent({ type: "like", promptId: prompt.id });
+  }
+
+  function useTemplate() {
+    if (!isRegistered) {
+      setMessage("Para usar plantillas debes iniciar sesión o crear una cuenta.");
+      return;
+    }
+
+    setShowTemplate((current) => !current);
+    startTransition(async () => {
+      const result = await registerTemplateUseAction(prompt.id);
+      if (result.ok) setStats(result.state.stats);
+    });
+    void trackAnalyticsEvent({ type: "uso_plantilla", promptId: prompt.id });
   }
 
   function reportPrompt() {
@@ -138,9 +156,15 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
     setMessage("Reporte enviado a moderación.");
   }
 
-  function updateMetric(field: keyof LocalPromptStats, value: number) {
-    updateManualPromptStat(prompt.id, field, value);
-    setStats(getLocalPromptStats(prompt));
+  function updateMetric(field: keyof PromptStatsSnapshot, value: number) {
+    const nextStats = { ...stats, [field]: Math.max(0, value) };
+    setStats(nextStats);
+
+    startTransition(async () => {
+      const result = await updatePromptStatsAction(prompt.id, nextStats);
+      setMessage(result.message);
+      if (result.ok) setStats(result.state.stats);
+    });
   }
 
   if (isGated) {
@@ -165,7 +189,7 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
         <aside className="side-panel stack">
           <Lock size={28} />
           <strong>Acceso de visitante agotado</strong>
-          <span className="muted">El limite se aplica al intentar abrir un segundo prompt completo.</span>
+          <span className="muted">El límite se aplica al intentar abrir un segundo prompt completo.</span>
         </aside>
       </div>
     );
@@ -203,28 +227,16 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
         <span className="muted">Primera publicación: {new Date(prompt.publishedAt).toLocaleDateString("es-ES")}</span>
         <pre className="prompt-text">{prompt.content}</pre>
         <div className="action-row">
-          <button className="button primary" type="button" onClick={copyPrompt}>
+          <button className="button primary" type="button" onClick={copyPrompt} disabled={isPending}>
             <Clipboard size={16} /> Copiar prompt
           </button>
-          <button
-            className="button secondary"
-            type="button"
-            onClick={() => {
-              if (!isRegistered) {
-                setMessage("Para usar plantillas debes iniciar sesión o crear una cuenta.");
-                return;
-              }
-              setShowTemplate((current) => !current);
-              awardLocalXp(`template:${prompt.id}`, 2);
-              void trackAnalyticsEvent({ type: "uso_plantilla", promptId: prompt.id });
-            }}
-          >
+          <button className="button secondary" type="button" onClick={useTemplate} disabled={isPending}>
             <PenLine size={16} /> Usar plantilla
           </button>
-          <button className="button secondary" type="button" onClick={saveFavorite}>
+          <button className="button secondary" type="button" onClick={saveFavorite} disabled={isPending}>
             <Star size={16} fill={favorited ? "currentColor" : "none"} /> {favorited ? "Guardado" : "Guardar"}
           </button>
-          <button className={`heart-button ${liked ? "liked" : ""}`} type="button" onClick={likePrompt}>
+          <button className={`heart-button ${liked ? "liked" : ""}`} type="button" onClick={likePrompt} disabled={isPending}>
             <Heart size={18} fill={liked ? "currentColor" : "none"} /> {liked ? "Te gusta" : "Me gusta"}
           </button>
           <button className="button danger" type="button" onClick={reportPrompt}>
@@ -294,9 +306,9 @@ function Metric({
 }: {
   label: string;
   value: number;
-  field: keyof LocalPromptStats;
+  field: keyof PromptStatsSnapshot;
   editable: boolean;
-  onChange: (field: keyof LocalPromptStats, value: number) => void;
+  onChange: (field: keyof PromptStatsSnapshot, value: number) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(String(value));

@@ -2,37 +2,43 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { CheckCircle2, Copy, FlaskConical, Heart, Languages, Sparkles } from "lucide-react";
-import { awardLocalXp, getLocalUser } from "@/lib/local-user";
-import { getLocalPromptStats, notifyStatsUpdated, type LocalPromptStats } from "@/lib/local-stats";
+import { getPromptInteractionStateAction, togglePromptLikeAction, type PromptStatsSnapshot } from "@/app/prompts/actions";
+import { getLocalUser } from "@/lib/local-user";
 import type { Prompt } from "@/lib/types";
 
 export function PromptCard({ prompt }: { prompt: Prompt }) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
-  const [stats, setStats] = useState<LocalPromptStats>({
+  const [stats, setStats] = useState<PromptStatsSnapshot>({
     likes: prompt.likes,
     favorites: prompt.favorites,
     copies: prompt.copies,
     templateUses: prompt.templateUses
   });
   const [status, setStatus] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const existing = window.localStorage.getItem("giant_likes");
-    const likes = existing ? (JSON.parse(existing) as string[]) : [];
-    setLiked(likes.includes(prompt.id));
-    setStats(getLocalPromptStats(prompt));
+    let cancelled = false;
+    setStats({
+      likes: prompt.likes,
+      favorites: prompt.favorites,
+      copies: prompt.copies,
+      templateUses: prompt.templateUses
+    });
 
-    const refresh = () => setStats(getLocalPromptStats(prompt));
-    window.addEventListener("giant:prompt-stats-updated", refresh);
-    window.addEventListener("storage", refresh);
+    getPromptInteractionStateAction(prompt.id).then((state) => {
+      if (cancelled) return;
+      setLiked(state.liked);
+      setStats(state.stats);
+    });
+
     return () => {
-      window.removeEventListener("giant:prompt-stats-updated", refresh);
-      window.removeEventListener("storage", refresh);
+      cancelled = true;
     };
-  }, [prompt.id]);
+  }, [prompt.id, prompt.favorites, prompt.likes, prompt.copies, prompt.templateUses]);
 
   function toggleLike(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
@@ -43,20 +49,14 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
       return;
     }
 
-    const existing = window.localStorage.getItem("giant_likes");
-    const likes = new Set(existing ? (JSON.parse(existing) as string[]) : []);
-    if (likes.has(prompt.id)) {
-      likes.delete(prompt.id);
-      setLiked(false);
-    } else {
-      likes.add(prompt.id);
-      setLiked(true);
-      awardLocalXp(`like:${prompt.id}`, 1);
-    }
-    window.localStorage.setItem("giant_likes", JSON.stringify(Array.from(likes)));
-    notifyStatsUpdated();
-    setStats(getLocalPromptStats(prompt));
-    setStatus("");
+    startTransition(async () => {
+      const result = await togglePromptLikeAction(prompt.id);
+      setStatus(result.message);
+      if (result.ok) {
+        setLiked(result.state.liked);
+        setStats(result.state.stats);
+      }
+    });
   }
 
   return (
@@ -123,6 +123,7 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
             type="button"
             title={liked ? "Quitar me gusta" : "Me gusta"}
             onClick={toggleLike}
+            disabled={isPending}
           >
             <Heart size={17} fill={liked ? "currentColor" : "none"} /> {stats.likes}
           </button>

@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/page": {
-          "moduleId": 2648,
+          "moduleId": 93339,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -11,6 +11,30 @@
       },
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
+    },
+    "4040b50584c929a78a855a82229984eb0bb0034bc9": {
+      "workers": {
+        "app/page": {
+          "moduleId": 93339,
+          "async": false,
+          "exportedName": "getPromptInteractionStateAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "getPromptInteractionStateAction",
+      "filename": "src/app/prompts/actions.ts"
+    },
+    "404290a3be575ffa11defbfb33579a5fd9a9f7858d": {
+      "workers": {
+        "app/page": {
+          "moduleId": 93339,
+          "async": false,
+          "exportedName": "togglePromptLikeAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "togglePromptLikeAction",
+      "filename": "src/app/prompts/actions.ts"
     }
   },
   "edge": {}

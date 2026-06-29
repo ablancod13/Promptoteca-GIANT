@@ -241,6 +241,8 @@ function groupBy(rows: Row[], field: string) {
 }
 
 function mergePrompts(remotePrompts: Prompt[], fallbackPrompts: Prompt[]) {
+  if (remotePrompts.length) return remotePrompts;
+
   const bySlug = new Map(remotePrompts.map((prompt) => [prompt.slug, prompt]));
   for (const prompt of fallbackPrompts) {
     if (!bySlug.has(prompt.slug)) bySlug.set(prompt.slug, prompt);

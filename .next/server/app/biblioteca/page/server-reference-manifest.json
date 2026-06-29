@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 15301,
+          "moduleId": 63709,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -11,6 +11,102 @@
       },
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
+    },
+    "609073884814e9c02bf0d932cb07b52433321e423b": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 63709,
+          "async": false,
+          "exportedName": "createLibraryFolderAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "createLibraryFolderAction",
+      "filename": "src/app/biblioteca/actions.ts"
+    },
+    "00212201e0b1dd06ccd97b64fc0c206851a8722b34": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 63709,
+          "async": false,
+          "exportedName": "getLibraryStateAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "getLibraryStateAction",
+      "filename": "src/app/biblioteca/actions.ts"
+    },
+    "601a3368c6862296c0b4c80c38718d70cd3e52980b": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 63709,
+          "async": false,
+          "exportedName": "moveFavoriteToFolderAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "moveFavoriteToFolderAction",
+      "filename": "src/app/biblioteca/actions.ts"
+    },
+    "40c6c00097c1eac6337cbd139981b112342a506884": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 63709,
+          "async": false,
+          "exportedName": "removeLibraryFavoriteAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "removeLibraryFavoriteAction",
+      "filename": "src/app/biblioteca/actions.ts"
+    },
+    "40c1147da1b26506fc787a27e4302d8a440ac663c8": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 63709,
+          "async": false,
+          "exportedName": "removeLibraryLikeAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "removeLibraryLikeAction",
+      "filename": "src/app/biblioteca/actions.ts"
+    },
+    "6022c86d2e23707910f147a4fe76557bff163de07d": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 63709,
+          "async": false,
+          "exportedName": "savePrivateNoteAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "savePrivateNoteAction",
+      "filename": "src/app/biblioteca/actions.ts"
+    },
+    "7001fc2ffcc302dad747a866e648e71b3b87a4e11f": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 63709,
+          "async": false,
+          "exportedName": "savePrivatePromptVersionAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "savePrivatePromptVersionAction",
+      "filename": "src/app/biblioteca/actions.ts"
+    },
+    "60e0be61230b4fe1790a24cba83bf7b0f1ad00b0a6": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 63709,
+          "async": false,
+          "exportedName": "updateLibraryFolderColorAction",
+          "filename": "src/app/biblioteca/actions.ts"
+        }
+      },
+      "exportedName": "updateLibraryFolderColorAction",
+      "filename": "src/app/biblioteca/actions.ts"
     }
   },
   "edge": {}

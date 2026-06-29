@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { Check, Clipboard, Save } from "lucide-react";
+import { saveTemplateVersionAction } from "@/app/biblioteca/actions";
 import { hydratePromptTemplate } from "@/lib/prompt-utils";
-import { awardLocalXp } from "@/lib/local-user";
 import type { Prompt } from "@/lib/types";
 
 export function TemplateWizard({ prompt }: { prompt: Prompt }) {
@@ -26,25 +26,9 @@ export function TemplateWizard({ prompt }: { prompt: Prompt }) {
     setStatus("Prompt personalizado copiado.");
   }
 
-  function saveVersion() {
-    const existing = window.localStorage.getItem("giant_custom_versions");
-    const versions = existing ? (JSON.parse(existing) as unknown[]) : [];
-    window.localStorage.setItem(
-      "giant_custom_versions",
-      JSON.stringify([
-        ...versions,
-        {
-          id: `${prompt.id}-${Date.now()}`,
-          promptId: prompt.id,
-          title: prompt.title,
-          text: generated,
-          values,
-          createdAt: new Date().toISOString()
-        }
-      ])
-    );
-    awardLocalXp(`custom-version:${prompt.id}:${Object.keys(values).length}`, 2);
-    setStatus("Versión privada guardada en este navegador.");
+  async function saveVersion() {
+    const result = await saveTemplateVersionAction(prompt.id, prompt.title, generated, values);
+    setStatus(result.message);
   }
 
   return (
