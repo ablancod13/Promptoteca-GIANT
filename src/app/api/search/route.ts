@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { createEmbedding } from "@/lib/openai/embeddings";
 import { applyPromptFilters } from "@/lib/prompt-utils";
-import { seedPrompts } from "@/lib/seed-data";
+import { listPrompts } from "@/lib/repository";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { PromptFilters } from "@/lib/types";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as PromptFilters & { semantic?: boolean };
   const query = body.query?.trim() ?? "";
+  const allPrompts = await listPrompts();
 
   if (body.semantic && query) {
     const embedding = await createEmbedding(query);
@@ -22,10 +23,10 @@ export async function POST(request: Request) {
       });
 
       if (!error && data) {
-        const bySlug = new Map(seedPrompts.map((prompt) => [prompt.slug, prompt]));
+        const bySlug = new Map(allPrompts.map((prompt) => [prompt.slug, prompt]));
         const orderedPrompts = (data as Array<{ slug: string }>)
           .map((row) => bySlug.get(row.slug))
-          .filter((prompt): prompt is (typeof seedPrompts)[number] => Boolean(prompt));
+          .filter((prompt): prompt is (typeof allPrompts)[number] => Boolean(prompt));
 
         if (orderedPrompts.length) {
           const filteredPrompts = orderedPrompts.filter(
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     mode: "text-fallback",
-    prompts: applyPromptFilters(seedPrompts, body),
+    prompts: applyPromptFilters(allPrompts, body),
     model: null
   });
 }

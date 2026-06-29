@@ -111,7 +111,7 @@
           "filename": "src/app/auth/actions.ts"
         },
         "app/subir/page": {
-          "moduleId": 83487,
+          "moduleId": 69127,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -203,6 +203,18 @@
       },
       "filename": "src/app/auth/actions.ts",
       "exportedName": "updateProfileAction"
+    },
+    "401bfd1152b778668bf26ce351b827e046cd2d922b": {
+      "workers": {
+        "app/subir/page": {
+          "moduleId": 69127,
+          "async": false,
+          "exportedName": "submitPromptAction",
+          "filename": "src/app/subir/actions.ts"
+        }
+      },
+      "filename": "src/app/subir/actions.ts",
+      "exportedName": "submitPromptAction"
     }
   },
   "edge": {},

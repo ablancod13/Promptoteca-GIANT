@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { CheckCircle2, Send } from "lucide-react";
+import { submitPromptAction } from "@/app/subir/actions";
+import { getCurrentProfileAction } from "@/app/auth/actions";
 import {
   AI_MODELS,
   INITIAL_CATEGORIES,
@@ -11,23 +13,34 @@ import {
   RECOMMENDED_TOOLS,
   TAXONOMY_STORAGE_KEYS
 } from "@/lib/constants";
-import { awardLocalXp, getLocalUser } from "@/lib/local-user";
-import { detectVariables, slugify } from "@/lib/prompt-utils";
+import { getLocalUser, saveLocalUser } from "@/lib/local-user";
+import { detectVariables } from "@/lib/prompt-utils";
 import type { PromptTool } from "@/lib/types";
 
 const LANGUAGE_OPTIONS = ["Español", "Inglés", "Catalán", "Euskera", "Francés", "Italiano", "Otro"];
 
-export function SubmissionForm() {
+interface SubmissionFormProps {
+  initialCategories?: string[];
+  initialTools?: string[];
+  initialModels?: string[];
+}
+
+export function SubmissionForm({
+  initialCategories = [...INITIAL_CATEGORIES],
+  initialTools = [...RECOMMENDED_TOOLS],
+  initialModels = [...AI_MODELS]
+}: SubmissionFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [content, setContent] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
   const [isRegistered, setIsRegistered] = useState<boolean | null>(null);
-  const [categoryOptions, setCategoryOptions] = useState<string[]>([...INITIAL_CATEGORIES]);
-  const [toolOptions, setToolOptions] = useState<string[]>([...RECOMMENDED_TOOLS]);
-  const [modelCatalog, setModelCatalog] = useState<string[]>([...AI_MODELS]);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>(initialCategories);
+  const [toolOptions, setToolOptions] = useState<string[]>(initialTools);
+  const [modelCatalog, setModelCatalog] = useState<string[]>(initialModels);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState("Español");
+  const [isPending, startTransition] = useTransition();
   const variables = useMemo(() => detectVariables("draft", content), [content]);
 
   const categories = useMemo(() => [...categoryOptions].sort((a, b) => a.localeCompare(b, "es")), [categoryOptions]);
@@ -45,11 +58,22 @@ export function SubmissionForm() {
   }, [modelCatalog, selectedTools]);
 
   useEffect(() => {
-    setIsRegistered(Boolean(getLocalUser()));
-    setCategoryOptions(loadList(TAXONOMY_STORAGE_KEYS.categories, [...INITIAL_CATEGORIES]));
-    setToolOptions(loadList(TAXONOMY_STORAGE_KEYS.tools, [...RECOMMENDED_TOOLS]));
-    setModelCatalog(loadList(TAXONOMY_STORAGE_KEYS.models, [...AI_MODELS]));
-  }, []);
+    const localUser = getLocalUser();
+    setIsRegistered(Boolean(localUser));
+
+    getCurrentProfileAction().then((remoteUser) => {
+      if (remoteUser) {
+        saveLocalUser(remoteUser);
+        setIsRegistered(true);
+      } else {
+        setIsRegistered(Boolean(getLocalUser()));
+      }
+    });
+
+    setCategoryOptions(loadList(TAXONOMY_STORAGE_KEYS.categories, initialCategories));
+    setToolOptions(loadList(TAXONOMY_STORAGE_KEYS.tools, initialTools));
+    setModelCatalog(loadList(TAXONOMY_STORAGE_KEYS.models, initialModels));
+  }, [initialCategories, initialModels, initialTools]);
 
   function toggleTool(tool: string, checked: boolean) {
     setSelectedTools((current) => {
@@ -66,39 +90,37 @@ export function SubmissionForm() {
     }
 
     const form = new FormData(event.currentTarget);
-    const title = String(form.get("title"));
     const language = selectedLanguage === "Otro" ? String(form.get("languageOther") ?? "").trim() : selectedLanguage;
-    const author = getLocalUser();
-    const draft = {
-      id: `draft-${Date.now()}`,
-      title,
-      slug: slugify(title),
-      summary: String(form.get("summary")),
-      content,
-      category: String(form.get("category")),
-      authorDisplayName: author?.displayName || author?.name || "Usuario GIANT",
-      tools: selectedTools,
-      language,
-      recommendedModel: String(form.get("recommendedModel") ?? ""),
-      intelligenceLevel: String(form.get("intelligenceLevel") ?? ""),
-      limitations: String(form.get("limitations") ?? ""),
-      misuseRisks: String(form.get("misuseRisks") ?? ""),
-      experimental: form.get("experimental") === "on",
-      variables,
-      reviewStatus: "pending",
-      createdAt: new Date().toISOString()
-    };
-    const existing = window.localStorage.getItem("giant_submitted_prompts");
-    const prompts = existing ? (JSON.parse(existing) as unknown[]) : [];
-    window.localStorage.setItem("giant_submitted_prompts", JSON.stringify([...prompts, draft]));
-    awardLocalXp(`submit:${draft.id}`, 5);
-    setSent(true);
-    setMessage("Prompt enviado. Puedes compartir otro cuando quieras.");
-    setContent("");
-    setSelectedTools([]);
-    setSelectedLanguage("Español");
-    formRef.current?.reset();
-    window.setTimeout(() => setSent(false), 1800);
+    setMessage("");
+
+    startTransition(async () => {
+      const result = await submitPromptAction({
+        title: String(form.get("title") ?? ""),
+        summary: String(form.get("summary") ?? ""),
+        content,
+        category: String(form.get("category") ?? ""),
+        tools: selectedTools,
+        language,
+        recommendedModel: String(form.get("recommendedModel") ?? ""),
+        intelligenceLevel: String(form.get("intelligenceLevel") ?? ""),
+        limitations: String(form.get("limitations") ?? ""),
+        misuseRisks: String(form.get("misuseRisks") ?? ""),
+        experimental: form.get("experimental") === "on",
+        noPatientDataConfirmed: form.get("noPatientData") === "on",
+        licenseAccepted: form.get("license") === "on"
+      });
+
+      setMessage(result.message);
+      if (!result.ok) return;
+
+      if (result.user) saveLocalUser(result.user);
+      setSent(true);
+      setContent("");
+      setSelectedTools([]);
+      setSelectedLanguage("Español");
+      formRef.current?.reset();
+      window.setTimeout(() => setSent(false), 1800);
+    });
   }
 
   if (isRegistered === false) {
@@ -227,8 +249,8 @@ export function SubmissionForm() {
       <label className="toggle">
         <input name="experimental" type="checkbox" /> Marcar como experimental
       </label>
-      <button className="button primary" type="submit">
-        <Send size={17} /> Publicar
+      <button className="button primary" type="submit" disabled={isPending}>
+        <Send size={17} /> {isPending ? "Publicando..." : "Publicar"}
       </button>
       {message ? (
         <div className={`callout ${sent ? "success-pulse" : ""}`}>

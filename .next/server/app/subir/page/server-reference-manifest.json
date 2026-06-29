@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/subir/page": {
-          "moduleId": 83487,
+          "moduleId": 69127,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -11,6 +11,18 @@
       },
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
+    },
+    "401bfd1152b778668bf26ce351b827e046cd2d922b": {
+      "workers": {
+        "app/subir/page": {
+          "moduleId": 69127,
+          "async": false,
+          "exportedName": "submitPromptAction",
+          "filename": "src/app/subir/actions.ts"
+        }
+      },
+      "exportedName": "submitPromptAction",
+      "filename": "src/app/subir/actions.ts"
     }
   },
   "edge": {}
