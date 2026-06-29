@@ -7,6 +7,7 @@ import {
   getPromptInteractionStateAction,
   registerPromptCopyAction,
   registerTemplateUseAction,
+  reportPromptAction,
   togglePromptFavoriteAction,
   togglePromptLikeAction,
   updatePromptStatsAction,
@@ -135,25 +136,10 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
   }
 
   function reportPrompt() {
-    const existing = window.localStorage.getItem("giant_reports");
-    const reports = existing ? (JSON.parse(existing) as unknown[]) : [];
-    window.localStorage.setItem(
-      "giant_reports",
-      JSON.stringify([
-        ...reports,
-        {
-          id: `report-${prompt.id}-${Date.now()}`,
-          promptId: prompt.id,
-          promptSlug: prompt.slug,
-          promptTitle: prompt.title,
-          createdAt: new Date().toISOString(),
-          reason: "revisión solicitada",
-          status: "open"
-        }
-      ])
-    );
-    window.dispatchEvent(new CustomEvent("giant:reports-updated"));
-    setMessage("Reporte enviado a moderación.");
+    startTransition(async () => {
+      const result = await reportPromptAction(prompt.id);
+      setMessage(result.message);
+    });
   }
 
   function updateMetric(field: keyof PromptStatsSnapshot, value: number) {

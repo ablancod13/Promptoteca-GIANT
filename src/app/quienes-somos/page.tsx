@@ -1,9 +1,12 @@
 import { AboutContentClient } from "@/components/AboutContentClient";
+import { getAboutContent } from "@/lib/about-repository";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const content = await getAboutContent();
+
   return (
     <main className="page">
-      <AboutContentClient />
+      <AboutContentClient content={content} />
     </main>
   );
 }

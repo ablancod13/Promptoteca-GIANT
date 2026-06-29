@@ -1,72 +1,78 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import { AI_MODELS, RECOMMENDED_TOOLS, TAXONOMY_STORAGE_KEYS } from "@/lib/constants";
-
-type TaxonomyKind = "categories" | "tools" | "models";
+import {
+  addTaxonomyItemAction,
+  deactivateTaxonomyItemAction,
+  type TaxonomyKind,
+  type TaxonomyState
+} from "@/app/moderacion/taxonomy-actions";
 
 const LABELS: Record<TaxonomyKind, { title: string; badge: string; placeholder: string; remove: string }> = {
   categories: {
     title: "Categorías",
     badge: "Orden alfabético",
     placeholder: "Nueva categoría",
-    remove: "Eliminar categoría"
+    remove: "Retirar categoría"
   },
   tools: {
     title: "Herramientas recomendadas",
     badge: "Formulario Compartir",
     placeholder: "Nueva herramienta",
-    remove: "Eliminar herramienta"
+    remove: "Retirar herramienta"
   },
   models: {
     title: "Modelos sugeridos",
     badge: "Opciones de autor",
     placeholder: "Nuevo modelo",
-    remove: "Eliminar modelo"
+    remove: "Retirar modelo"
   }
 };
 
-export function CategoryManager({ initialCategories }: { initialCategories: string[] }) {
-  const [items, setItems] = useState<Record<TaxonomyKind, string[]>>({
-    categories: [],
-    tools: [],
-    models: []
-  });
+export function CategoryManager({ initialState }: { initialState: TaxonomyState }) {
+  const [items, setItems] = useState<TaxonomyState>(initialState);
   const [drafts, setDrafts] = useState<Record<TaxonomyKind, string>>({
     categories: "",
     tools: "",
     models: ""
   });
-
-  useEffect(() => {
-    setItems({
-      categories: loadList(TAXONOMY_STORAGE_KEYS.categories, initialCategories),
-      tools: loadList(TAXONOMY_STORAGE_KEYS.tools, [...RECOMMENDED_TOOLS]),
-      models: loadList(TAXONOMY_STORAGE_KEYS.models, [...AI_MODELS])
-    });
-  }, [initialCategories]);
+  const [modelTool, setModelTool] = useState("");
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   const ordered = useMemo(
     () => ({
-      categories: [...items.categories].sort((a, b) => a.localeCompare(b, "es")),
-      tools: [...items.tools].sort((a, b) => a.localeCompare(b, "es")),
-      models: [...items.models].sort((a, b) => a.localeCompare(b, "es"))
+      categories: [...items.categories].sort(sortByName),
+      tools: [...items.tools].sort(sortByName),
+      models: [...items.models].sort(sortByName)
     }),
     [items]
   );
 
-  function persist(kind: TaxonomyKind, next: string[]) {
-    const unique = [...new Set(next.map((item) => item.trim()).filter(Boolean))];
-    setItems((current) => ({ ...current, [kind]: unique }));
-    window.localStorage.setItem(TAXONOMY_STORAGE_KEYS[kind], JSON.stringify(unique));
-  }
-
   function addItem(kind: TaxonomyKind) {
     const value = drafts[kind].trim();
-    if (!value || items[kind].includes(value)) return;
-    persist(kind, [...items[kind], value]);
-    setDrafts((current) => ({ ...current, [kind]: "" }));
+    if (!value) return;
+
+    setMessage("");
+    startTransition(async () => {
+      const result = await addTaxonomyItemAction(kind, value, kind === "models" ? modelTool : undefined);
+      setMessage(result.message);
+      if (result.ok && result.state) {
+        setItems(result.state);
+        setDrafts((current) => ({ ...current, [kind]: "" }));
+        if (kind === "models") setModelTool("");
+      }
+    });
+  }
+
+  function removeItem(kind: TaxonomyKind, id: string) {
+    setMessage("");
+    startTransition(async () => {
+      const result = await deactivateTaxonomyItemAction(kind, id);
+      setMessage(result.message);
+      if (result.ok && result.state) setItems(result.state);
+    });
   }
 
   return (
@@ -91,20 +97,29 @@ export function CategoryManager({ initialCategories }: { initialCategories: stri
                   onChange={(event) => setDrafts((current) => ({ ...current, [kind]: event.target.value }))}
                   placeholder={label.placeholder}
                 />
-                <button className="button primary" type="button" onClick={() => addItem(kind)}>
+                <button className="button primary" type="button" onClick={() => addItem(kind)} disabled={isPending}>
                   <Plus size={16} /> Añadir
                 </button>
               </div>
+              {kind === "models" ? (
+                <label className="field">
+                  <span>Herramienta asociada</span>
+                  <select className="select" value={modelTool} onChange={(event) => setModelTool(event.target.value)}>
+                    <option value="">Sin asociación</option>
+                    {ordered.tools.map((tool) => (
+                      <option value={tool.name} key={tool.id}>
+                        {tool.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
               <div className="badge-row taxonomy-list">
                 {ordered[kind].map((item) => (
-                  <span className="badge" key={item}>
-                    {item}
-                    <button
-                      className="chip-remove"
-                      type="button"
-                      title={label.remove}
-                      onClick={() => persist(kind, items[kind].filter((current) => current !== item))}
-                    >
+                  <span className="badge" key={item.id}>
+                    {item.name}
+                    {kind === "models" && item.toolName ? <small> · {item.toolName}</small> : null}
+                    <button className="chip-remove" type="button" title={label.remove} onClick={() => removeItem(kind, item.id)}>
                       <Trash2 size={13} />
                     </button>
                   </span>
@@ -114,11 +129,11 @@ export function CategoryManager({ initialCategories }: { initialCategories: stri
           );
         })}
       </div>
+      {message ? <div className="callout">{message}</div> : null}
     </section>
   );
 }
 
-function loadList(key: string, fallback: string[]) {
-  const stored = window.localStorage.getItem(key);
-  return stored ? (JSON.parse(stored) as string[]) : fallback;
+function sortByName(a: { name: string }, b: { name: string }) {
+  return a.name.localeCompare(b.name, "es");
 }

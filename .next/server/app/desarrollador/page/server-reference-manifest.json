@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 96707,
+          "moduleId": 19714,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -11,6 +11,78 @@
       },
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
+    },
+    "00ff68168a01667a73a679a339d421483270b2cf70": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "canDevelopAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "exportedName": "canDevelopAction",
+      "filename": "src/app/desarrollador/actions.ts"
+    },
+    "40f5f7cc97cab23f4652fe987134eabc45bb1298cc": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "listDeveloperUsersAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "exportedName": "listDeveloperUsersAction",
+      "filename": "src/app/desarrollador/actions.ts"
+    },
+    "60ae4d9b600d0e0c8356b13b76913c792e37e94b35": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "penalizeUserAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "exportedName": "penalizeUserAction",
+      "filename": "src/app/desarrollador/actions.ts"
+    },
+    "60196f3162d4fb3c599951855cb280f11f39f03309": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "setUserAccountStatusAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "exportedName": "setUserAccountStatusAction",
+      "filename": "src/app/desarrollador/actions.ts"
+    },
+    "001b0e6a0d6ae8279ffad130f5dc0767c8249578f6": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "getAboutContentAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "exportedName": "getAboutContentAction",
+      "filename": "src/app/desarrollador/actions.ts"
+    },
+    "4093afdda79020f64be75982014125e7b757ac05c7": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "saveAboutContentAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "exportedName": "saveAboutContentAction",
+      "filename": "src/app/desarrollador/actions.ts"
     }
   },
   "edge": {}

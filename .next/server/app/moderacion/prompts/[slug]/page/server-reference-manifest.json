@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/moderacion/prompts/[slug]/page": {
-          "moduleId": 6958,
+          "moduleId": 14259,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -11,6 +11,18 @@
       },
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
+    },
+    "4061dc5da1fda46c09344b591266ddaa70a87ba047": {
+      "workers": {
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 14259,
+          "async": false,
+          "exportedName": "saveModeratedPromptAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "exportedName": "saveModeratedPromptAction",
+      "filename": "src/app/moderacion/actions.ts"
     }
   },
   "edge": {}

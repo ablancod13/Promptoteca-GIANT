@@ -132,6 +132,38 @@ export async function updatePromptStatsAction(promptId: string, stats: PromptSta
   };
 }
 
+export async function reportPromptAction(promptId: string, reason = "revisión solicitada", details = ""): Promise<{ ok: boolean; message: string }> {
+  const admin = createSupabaseAdminClient();
+  const supabase = await createSupabaseServerClient();
+  if (!admin) return { ok: false, message: "Supabase no esta configurado." };
+
+  const { data: authData } = (await supabase?.auth.getUser()) ?? { data: { user: null } };
+  const { data: prompt } = await admin.from("prompts").select("id,review_status").eq("id", promptId).single();
+  if (!prompt || ["hidden", "archived", "rejected"].includes(String(prompt.review_status))) {
+    return { ok: false, message: "No se puede reportar este prompt." };
+  }
+
+  const { error } = await admin.from("reports").insert({
+    prompt_id: promptId,
+    reporter_id: authData.user?.id ?? null,
+    reason,
+    details: details || null,
+    status: "open"
+  });
+
+  if (error) return { ok: false, message: "No se pudo enviar el reporte." };
+
+  await admin.from("analytics_events").insert({
+    user_id: authData.user?.id ?? null,
+    event_type: "prompt_reported",
+    prompt_id: promptId,
+    metadata: { reason }
+  });
+
+  revalidatePath("/moderacion");
+  return { ok: true, message: "Reporte enviado a moderacion." };
+}
+
 async function togglePromptRelation(promptId: string, table: "likes" | "favorites"): Promise<InteractionResult> {
   const context = await getActionContext(promptId);
   if (!context.ok) return context;

@@ -1,10 +1,15 @@
-import { AI_MODELS, INITIAL_CATEGORIES, RECOMMENDED_TOOLS } from "@/lib/constants";
+import { AI_MODELS, INITIAL_CATEGORIES, MODELS_BY_TOOL, RECOMMENDED_TOOLS } from "@/lib/constants";
 import { applyPromptFilters, detectVariables } from "@/lib/prompt-utils";
 import { seedPrompts } from "@/lib/seed-data";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Difficulty, Prompt, PromptFilters, PromptTool, PromptVariable, ReviewStatus, VariableFieldType } from "@/lib/types";
 
 type Row = Record<string, any>;
+
+export interface SubmissionModelOption {
+  name: string;
+  toolName?: string;
+}
 
 export async function listPrompts(filters?: PromptFilters): Promise<Prompt[]> {
   const prompts = mergePrompts(await listSupabasePrompts(), seedPrompts);
@@ -26,26 +31,36 @@ export async function listCategoryNames(): Promise<string[]> {
   return (remote.length ? remote : [...INITIAL_CATEGORIES]).sort((a, b) => a.localeCompare(b, "es"));
 }
 
-export async function listSubmissionOptions(): Promise<{ categories: string[]; tools: string[]; models: string[] }> {
+export async function listSubmissionOptions(): Promise<{
+  categories: string[];
+  tools: string[];
+  models: string[];
+  modelOptions: SubmissionModelOption[];
+}> {
   const supabase = createSupabaseAdminClient();
   if (!supabase) {
+    const modelOptions = fallbackModelOptions();
     return {
       categories: [...INITIAL_CATEGORIES].sort((a, b) => a.localeCompare(b, "es")),
       tools: [...RECOMMENDED_TOOLS].sort((a, b) => a.localeCompare(b, "es")),
-      models: [...AI_MODELS]
+      models: modelOptions.map((model) => model.name),
+      modelOptions
     };
   }
 
   const [categories, tools, models] = await Promise.all([
     supabase.from("categories").select("name").eq("status", "active").order("name"),
     supabase.from("prompt_tool_options").select("name").eq("status", "active").order("name"),
-    supabase.from("ai_model_options").select("name").eq("status", "active").order("name")
+    supabase.from("ai_model_options").select("name,tool_name").eq("status", "active").order("name")
   ]);
+
+  const modelOptions = modelOptionsOrFallback(models.data);
 
   return {
     categories: valuesOrFallback(categories.data, INITIAL_CATEGORIES),
     tools: valuesOrFallback(tools.data, RECOMMENDED_TOOLS),
-    models: valuesOrFallback(models.data, AI_MODELS)
+    models: modelOptions.map((model) => model.name),
+    modelOptions
   };
 }
 
@@ -253,4 +268,23 @@ function mergePrompts(remotePrompts: Prompt[], fallbackPrompts: Prompt[]) {
 function valuesOrFallback<T extends readonly string[] | string[]>(rows: Array<{ name: string }> | null, fallback: T): string[] {
   const values = rows?.map((row) => String(row.name)).filter(Boolean) ?? [];
   return (values.length ? values : [...fallback]).sort((a, b) => a.localeCompare(b, "es"));
+}
+
+function modelOptionsOrFallback(rows: Array<{ name: string; tool_name?: string | null }> | null): SubmissionModelOption[] {
+  const values =
+    rows
+      ?.map((row) => ({
+        name: String(row.name),
+        toolName: row.tool_name ? String(row.tool_name) : undefined
+      }))
+      .filter((row) => row.name) ?? [];
+
+  return (values.length ? values : fallbackModelOptions()).sort((a, b) => a.name.localeCompare(b.name, "es"));
+}
+
+function fallbackModelOptions(): SubmissionModelOption[] {
+  return AI_MODELS.map((name) => {
+    const toolName = (Object.keys(MODELS_BY_TOOL) as PromptTool[]).find((tool) => MODELS_BY_TOOL[tool].includes(name));
+    return { name, toolName };
+  });
 }

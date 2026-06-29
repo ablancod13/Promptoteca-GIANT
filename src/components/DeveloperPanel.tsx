@@ -1,47 +1,67 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { MinusCircle, ShieldAlert } from "lucide-react";
-import { canDevelop, getLocalUser } from "@/lib/local-user";
+import { MinusCircle, Search, ShieldAlert } from "lucide-react";
+import {
+  canDevelopAction,
+  listDeveloperUsersAction,
+  penalizeUserAction,
+  setUserAccountStatusAction,
+  type DeveloperUser
+} from "@/app/desarrollador/actions";
 import { DeveloperAboutEditor } from "@/components/DeveloperAboutEditor";
-
-interface DemoUser {
-  id: string;
-  name: string;
-  email: string;
-  status: "active" | "blocked";
-  xp: number;
-}
-
-const DEMO_USERS: DemoUser[] = [
-  { id: "u1", name: "Ana Rivera", email: "ana@giant.local", status: "active", xp: 760 },
-  { id: "u2", name: "Mateo Soler", email: "mateo@giant.local", status: "active", xp: 420 },
-  { id: "u3", name: "Lucia Martin", email: "lucia@giant.local", status: "active", xp: 210 }
-];
 
 export function DeveloperPanel() {
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [query, setQuery] = useState("");
-  const [users, setUsers] = useState(DEMO_USERS);
+  const [users, setUsers] = useState<DeveloperUser[]>([]);
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    setAllowed(canDevelop(getLocalUser()));
+    canDevelopAction().then((canDevelop) => {
+      setAllowed(canDevelop);
+      if (canDevelop) void refreshUsers("");
+    });
   }, []);
 
-  const filteredUsers = useMemo(
-    () => users.filter((user) => `${user.name} ${user.email}`.toLowerCase().includes(query.toLowerCase())),
-    [query, users]
-  );
-
-  function toggleBlock(userId: string) {
-    setUsers((current) =>
-      current.map((user) => (user.id === userId ? { ...user, status: user.status === "active" ? "blocked" : "active" } : user))
+  const filteredUsers = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase("es");
+    if (!normalized) return users;
+    return users.filter((user) =>
+      `${user.displayName} ${user.email} ${user.professionalRole}`.toLocaleLowerCase("es").includes(normalized)
     );
+  }, [query, users]);
+
+  async function refreshUsers(nextQuery = query) {
+    const nextUsers = await listDeveloperUsersAction(nextQuery);
+    setUsers(nextUsers);
   }
 
-  function penalize(userId: string) {
-    setUsers((current) => current.map((user) => (user.id === userId ? { ...user, xp: Math.max(0, user.xp - 25) } : user)));
+  function searchUsers() {
+    startTransition(async () => {
+      await refreshUsers(query);
+    });
+  }
+
+  function toggleBlock(user: DeveloperUser) {
+    setMessage("");
+    startTransition(async () => {
+      const nextStatus = user.status === "active" ? "blocked" : "active";
+      const result = await setUserAccountStatusAction(user.id, nextStatus);
+      setMessage(result.message);
+      if (result.ok) await refreshUsers();
+    });
+  }
+
+  function penalize(user: DeveloperUser) {
+    setMessage("");
+    startTransition(async () => {
+      const result = await penalizeUserAction(user.id, 25);
+      setMessage(result.message);
+      if (result.ok) await refreshUsers();
+    });
   }
 
   if (allowed === false) {
@@ -75,11 +95,17 @@ export function DeveloperPanel() {
             <ShieldAlert size={14} /> Herramientas sensibles
           </span>
         </div>
-        <input className="input" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar usuario" />
+        <div className="action-row">
+          <input className="input" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar usuario" />
+          <button className="button secondary" type="button" onClick={searchUsers} disabled={isPending}>
+            <Search size={16} /> Buscar
+          </button>
+        </div>
         <table className="table">
           <thead>
             <tr>
               <th>Usuario</th>
+              <th>Rol</th>
               <th>Estado</th>
               <th>XP</th>
               <th>Acciones</th>
@@ -89,17 +115,21 @@ export function DeveloperPanel() {
             {filteredUsers.map((user) => (
               <tr key={user.id}>
                 <td>
-                  <strong>{user.name}</strong>
+                  <strong>{user.displayName}</strong>
                   <p className="muted">{user.email}</p>
+                </td>
+                <td>
+                  <span className="badge">{user.platformRole}</span>
+                  <p className="muted">{user.professionalRole}</p>
                 </td>
                 <td>{user.status}</td>
                 <td>{user.xp}</td>
                 <td>
                   <div className="action-row">
-                    <button className="button secondary" type="button" onClick={() => toggleBlock(user.id)}>
+                    <button className="button secondary" type="button" onClick={() => toggleBlock(user)} disabled={isPending}>
                       {user.status === "active" ? "Bloquear" : "Reactivar"}
                     </button>
-                    <button className="button danger" type="button" onClick={() => penalize(user.id)}>
+                    <button className="button danger" type="button" onClick={() => penalize(user)} disabled={isPending}>
                       <MinusCircle size={16} /> -25 XP
                     </button>
                   </div>
@@ -108,6 +138,8 @@ export function DeveloperPanel() {
             ))}
           </tbody>
         </table>
+        {!filteredUsers.length ? <div className="empty-state">No hay usuarios con ese filtro.</div> : null}
+        {message ? <div className="callout">{message}</div> : null}
       </section>
     </div>
   );

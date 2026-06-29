@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { RECOMMENDED_TOOLS, TAXONOMY_STORAGE_KEYS } from "@/lib/constants";
+import { RECOMMENDED_TOOLS } from "@/lib/constants";
 import { applyPromptFilters } from "@/lib/prompt-utils";
 import type { Difficulty, Prompt, PromptFilters } from "@/lib/types";
 import { PromptCard } from "@/components/PromptCard";
@@ -10,13 +10,14 @@ import { PromptCard } from "@/components/PromptCard";
 interface PromptExplorerProps {
   prompts: Prompt[];
   categories: string[];
+  tools?: string[];
   initialCategory?: string;
   initialAuthor?: string;
 }
 
-export function PromptExplorer({ prompts, categories, initialCategory = "", initialAuthor = "" }: PromptExplorerProps) {
-  const [categoryOptions, setCategoryOptions] = useState(categories);
-  const [toolOptions, setToolOptions] = useState<string[]>(RECOMMENDED_TOOLS);
+export function PromptExplorer({ prompts, categories, tools = [...RECOMMENDED_TOOLS], initialCategory = "", initialAuthor = "" }: PromptExplorerProps) {
+  const categoryOptions = useMemo(() => [...new Set(categories)].sort((a, b) => a.localeCompare(b, "es")), [categories]);
+  const toolOptions = useMemo(() => [...new Set(tools)].sort((a, b) => a.localeCompare(b, "es")), [tools]);
   const [filters, setFilters] = useState<PromptFilters>({
     query: "",
     category: initialCategory,
@@ -31,15 +32,6 @@ export function PromptExplorer({ prompts, categories, initialCategory = "", init
   const localResults = useMemo(() => applyPromptFilters(prompts, filters), [filters, prompts]);
   const results = serverResults ?? localResults;
   const languages = Array.from(new Set(prompts.flatMap((prompt) => [prompt.language, prompt.bestLanguage]))).sort();
-
-  useEffect(() => {
-    const storedCategories = window.localStorage.getItem(TAXONOMY_STORAGE_KEYS.categories);
-    const storedTools = window.localStorage.getItem(TAXONOMY_STORAGE_KEYS.tools);
-    const nextCategories = storedCategories ? (JSON.parse(storedCategories) as string[]) : categories;
-    const nextTools = storedTools ? (JSON.parse(storedTools) as string[]) : RECOMMENDED_TOOLS;
-    setCategoryOptions([...new Set(nextCategories)].sort((a, b) => a.localeCompare(b, "es")));
-    setToolOptions([...new Set(nextTools)].sort((a, b) => a.localeCompare(b, "es")));
-  }, [categories]);
 
   useEffect(() => {
     const query = filters.query?.trim();
@@ -59,7 +51,7 @@ export function PromptExplorer({ prompts, categories, initialCategory = "", init
         });
         const payload = (await response.json()) as { prompts: Prompt[] };
         setServerResults(payload.prompts);
-      } catch (error) {
+      } catch {
         if (!controller.signal.aborted) {
           setServerResults(null);
         }
@@ -168,7 +160,7 @@ export function PromptExplorer({ prompts, categories, initialCategory = "", init
           <option value="recientes">Más recientes</option>
           <option value="votados">Más votados</option>
           <option value="guardados">Más guardados</option>
-          <option value="copiados">Más copiados</option>
+          <option value="copiados">Más usados</option>
           <option value="calidad">Mayor calidad GIANT</option>
         </select>
       </div>

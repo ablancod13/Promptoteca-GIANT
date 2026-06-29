@@ -3,18 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { CheckCircle2, Send } from "lucide-react";
-import { submitPromptAction } from "@/app/subir/actions";
 import { getCurrentProfileAction } from "@/app/auth/actions";
-import {
-  AI_MODELS,
-  INITIAL_CATEGORIES,
-  INTELLIGENCE_LEVELS,
-  MODELS_BY_TOOL,
-  RECOMMENDED_TOOLS,
-  TAXONOMY_STORAGE_KEYS
-} from "@/lib/constants";
+import { submitPromptAction } from "@/app/subir/actions";
+import { AI_MODELS, INITIAL_CATEGORIES, INTELLIGENCE_LEVELS, MODELS_BY_TOOL, RECOMMENDED_TOOLS } from "@/lib/constants";
 import { getLocalUser, saveLocalUser } from "@/lib/local-user";
 import { detectVariables } from "@/lib/prompt-utils";
+import type { SubmissionModelOption } from "@/lib/repository";
 import type { PromptTool } from "@/lib/types";
 
 const LANGUAGE_OPTIONS = ["Español", "Inglés", "Catalán", "Euskera", "Francés", "Italiano", "Otro"];
@@ -23,38 +17,48 @@ interface SubmissionFormProps {
   initialCategories?: string[];
   initialTools?: string[];
   initialModels?: string[];
+  initialModelOptions?: SubmissionModelOption[];
 }
 
 export function SubmissionForm({
   initialCategories = [...INITIAL_CATEGORIES],
   initialTools = [...RECOMMENDED_TOOLS],
-  initialModels = [...AI_MODELS]
+  initialModels = [...AI_MODELS],
+  initialModelOptions
 }: SubmissionFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [content, setContent] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
   const [isRegistered, setIsRegistered] = useState<boolean | null>(null);
-  const [categoryOptions, setCategoryOptions] = useState<string[]>(initialCategories);
-  const [toolOptions, setToolOptions] = useState<string[]>(initialTools);
-  const [modelCatalog, setModelCatalog] = useState<string[]>(initialModels);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState("Español");
   const [isPending, startTransition] = useTransition();
   const variables = useMemo(() => detectVariables("draft", content), [content]);
 
-  const categories = useMemo(() => [...categoryOptions].sort((a, b) => a.localeCompare(b, "es")), [categoryOptions]);
+  const categories = useMemo(() => [...initialCategories].sort((a, b) => a.localeCompare(b, "es")), [initialCategories]);
+  const tools = useMemo(() => [...initialTools].sort((a, b) => a.localeCompare(b, "es")), [initialTools]);
+  const modelCatalog = useMemo(
+    () =>
+      (initialModelOptions?.length
+        ? initialModelOptions
+        : initialModels.map((name) => ({ name, toolName: inferToolForModel(name) }))
+      ).sort((a, b) => a.name.localeCompare(b.name, "es")),
+    [initialModelOptions, initialModels]
+  );
 
-  const modelOptions = useMemo(() => {
-    if (!selectedTools.length) return modelCatalog;
+  const filteredModels = useMemo(() => {
+    if (!selectedTools.length) return uniqueModelNames(modelCatalog);
 
-    const matched = selectedTools.flatMap((tool) => {
-      const known = MODELS_BY_TOOL[tool as PromptTool] ?? [];
-      const inferred = modelCatalog.filter((model) => model.toLowerCase().includes(tool.toLowerCase()));
-      return [...known, ...inferred];
-    });
-    const unique = [...new Set([...matched, "Otro"])].filter((model) => modelCatalog.includes(model) || model === "Otro");
-    return unique.length ? unique : ["Otro"];
+    const matched = modelCatalog.filter((model) =>
+      selectedTools.some((tool) => {
+        const known = MODELS_BY_TOOL[tool as PromptTool] ?? [];
+        return model.toolName === tool || known.includes(model.name) || model.name.toLocaleLowerCase("es").includes(tool.toLocaleLowerCase("es"));
+      })
+    );
+
+    const names = uniqueModelNames(matched);
+    return names.includes("Otro") ? names : [...names, "Otro"];
   }, [modelCatalog, selectedTools]);
 
   useEffect(() => {
@@ -69,11 +73,7 @@ export function SubmissionForm({
         setIsRegistered(Boolean(getLocalUser()));
       }
     });
-
-    setCategoryOptions(loadList(TAXONOMY_STORAGE_KEYS.categories, initialCategories));
-    setToolOptions(loadList(TAXONOMY_STORAGE_KEYS.tools, initialTools));
-    setModelCatalog(loadList(TAXONOMY_STORAGE_KEYS.models, initialModels));
-  }, [initialCategories, initialModels, initialTools]);
+  }, []);
 
   function toggleTool(tool: string, checked: boolean) {
     setSelectedTools((current) => {
@@ -165,7 +165,7 @@ export function SubmissionForm({
         <div className="field">
           <span>Herramientas recomendadas</span>
           <div className="checkbox-grid">
-            {toolOptions.map((tool) => (
+            {tools.map((tool) => (
               <label className="check-card" key={tool}>
                 <input
                   type="checkbox"
@@ -199,7 +199,7 @@ export function SubmissionForm({
           <span>Modelo sugerido</span>
           <select className="select" name="recommendedModel">
             <option value="">Sin preferencia</option>
-            {modelOptions.map((model) => (
+            {filteredModels.map((model) => (
               <option value={model} key={model}>
                 {model}
               </option>
@@ -262,7 +262,10 @@ export function SubmissionForm({
   );
 }
 
-function loadList(key: string, fallback: string[]) {
-  const stored = window.localStorage.getItem(key);
-  return stored ? (JSON.parse(stored) as string[]) : fallback;
+function uniqueModelNames(models: SubmissionModelOption[]) {
+  return [...new Set(models.map((model) => model.name).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es"));
+}
+
+function inferToolForModel(name: string) {
+  return (Object.keys(MODELS_BY_TOOL) as PromptTool[]).find((tool) => MODELS_BY_TOOL[tool].includes(name));
 }

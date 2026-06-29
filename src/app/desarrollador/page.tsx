@@ -7,7 +7,7 @@ export default function DeveloperPage() {
         <div>
           <span className="eyebrow">Desarrollador</span>
           <h1>Control avanzado</h1>
-          <p className="lead">Usuarios, bloqueos temporales y ajustes de puntos.</p>
+          <p className="lead">Usuarios, bloqueos temporales, ajustes de puntos y contenido público.</p>
         </div>
       </div>
       <DeveloperPanel />

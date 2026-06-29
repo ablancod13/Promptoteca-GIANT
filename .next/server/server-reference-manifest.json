@@ -33,7 +33,7 @@
           "filename": "src/app/auth/actions.ts"
         },
         "app/desarrollador/page": {
-          "moduleId": 96707,
+          "moduleId": 19714,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -57,13 +57,13 @@
           "filename": "src/app/auth/actions.ts"
         },
         "app/moderacion/page": {
-          "moduleId": 265,
+          "moduleId": 82253,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/moderacion/prompts/[slug]/page": {
-          "moduleId": 6958,
+          "moduleId": 14259,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -81,7 +81,7 @@
           "filename": "src/app/auth/actions.ts"
         },
         "app/prompts/[slug]/editar/page": {
-          "moduleId": 98933,
+          "moduleId": 68936,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -288,6 +288,78 @@
       "filename": "src/app/auth/actions.ts",
       "exportedName": "verifySignupOtpAction"
     },
+    "00ff68168a01667a73a679a339d421483270b2cf70": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "canDevelopAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "canDevelopAction"
+    },
+    "40f5f7cc97cab23f4652fe987134eabc45bb1298cc": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "listDeveloperUsersAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "listDeveloperUsersAction"
+    },
+    "60ae4d9b600d0e0c8356b13b76913c792e37e94b35": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "penalizeUserAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "penalizeUserAction"
+    },
+    "60196f3162d4fb3c599951855cb280f11f39f03309": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "setUserAccountStatusAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "setUserAccountStatusAction"
+    },
+    "001b0e6a0d6ae8279ffad130f5dc0767c8249578f6": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "getAboutContentAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "getAboutContentAction"
+    },
+    "4093afdda79020f64be75982014125e7b757ac05c7": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 19714,
+          "async": false,
+          "exportedName": "saveAboutContentAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "saveAboutContentAction"
+    },
     "404fb620eeb560d6c27f78d96a38ca5a17493c9e66": {
       "workers": {
         "app/login/page": {
@@ -323,6 +395,150 @@
       },
       "filename": "src/app/auth/actions.ts",
       "exportedName": "registerAction"
+    },
+    "704ac73d586aac1e60b291b0ddf78f1c62f51e8222": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "addTaxonomyItemAction",
+          "filename": "src/app/moderacion/taxonomy-actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/taxonomy-actions.ts",
+      "exportedName": "addTaxonomyItemAction"
+    },
+    "60aa0480c3bac1d24d3fabd0fb5e23a927745328a4": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "deactivateTaxonomyItemAction",
+          "filename": "src/app/moderacion/taxonomy-actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/taxonomy-actions.ts",
+      "exportedName": "deactivateTaxonomyItemAction"
+    },
+    "002f846f7d2baf51b095c8ecf62857ee304887caf5": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "canModerateAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/actions.ts",
+      "exportedName": "canModerateAction"
+    },
+    "40041677d0cd20d2e5449974e84eba98e53d6ae001": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "deletePromptAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/actions.ts",
+      "exportedName": "deletePromptAction"
+    },
+    "600b12dea79615e4a9254623c2ab250f7917f1e1a4": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "moderatePromptStatusAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/actions.ts",
+      "exportedName": "moderatePromptStatusAction"
+    },
+    "4001b2900b0561b6a96c8493d5005410fe96bd4edc": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "resolveReportAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/actions.ts",
+      "exportedName": "resolveReportAction"
+    },
+    "4017417ee1c645b4a26ceb5fb11ea7beabcb463a5c": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "togglePromptExperimentalAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/actions.ts",
+      "exportedName": "togglePromptExperimentalAction"
+    },
+    "4090d4a8c5f5e38a42139efda864134cdf478b3c34": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "togglePromptValidatedAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/actions.ts",
+      "exportedName": "togglePromptValidatedAction"
+    },
+    "00211c9131a9d24963155538726b8b5ae796c905ba": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "listOpenReportsAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/actions.ts",
+      "exportedName": "listOpenReportsAction"
+    },
+    "4061dc5da1fda46c09344b591266ddaa70a87ba047": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "saveModeratedPromptAction",
+          "filename": "src/app/moderacion/actions.ts"
+        },
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 14259,
+          "async": false,
+          "exportedName": "saveModeratedPromptAction",
+          "filename": "src/app/moderacion/actions.ts"
+        },
+        "app/prompts/[slug]/editar/page": {
+          "moduleId": 68936,
+          "async": false,
+          "exportedName": "saveModeratedPromptAction",
+          "filename": "src/app/moderacion/actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/actions.ts",
+      "exportedName": "saveModeratedPromptAction"
+    },
+    "005caa01a0605c8f8ba82c47e8c9de0b1980ae6954": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 82253,
+          "async": false,
+          "exportedName": "listTaxonomyAction",
+          "filename": "src/app/moderacion/taxonomy-actions.ts"
+        }
+      },
+      "filename": "src/app/moderacion/taxonomy-actions.ts",
+      "exportedName": "listTaxonomyAction"
     },
     "002fa4f94d711bd76db9ea3fd8fe99d70c4fbc0cef": {
       "workers": {
@@ -383,6 +599,18 @@
       },
       "filename": "src/app/prompts/actions.ts",
       "exportedName": "registerTemplateUseAction"
+    },
+    "704448dcdb90e3e5672931d525f56ff33555c4a5c2": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "reportPromptAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "filename": "src/app/prompts/actions.ts",
+      "exportedName": "reportPromptAction"
     },
     "4019623c6485537adacb95a28ae00aa5f5bd21b953": {
       "workers": {

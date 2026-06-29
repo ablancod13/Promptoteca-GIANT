@@ -1,13 +1,14 @@
 import { PromptExplorer } from "@/components/PromptExplorer";
-import { getCategorySummary, getPromptsByCategory, listPrompts } from "@/lib/repository";
+import { getCategorySummary, getPromptsByCategory, listPrompts, listSubmissionOptions } from "@/lib/repository";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const category = decodeURIComponent(slug);
-  const [categoryPrompts, allPrompts, categories] = await Promise.all([
+  const [categoryPrompts, allPrompts, categories, options] = await Promise.all([
     getPromptsByCategory(category),
     listPrompts(),
-    getCategorySummary()
+    getCategorySummary(),
+    listSubmissionOptions()
   ]);
 
   return (
@@ -19,7 +20,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           <p className="lead">{categoryPrompts.length} prompts encontrados en esta categoría o como categoría secundaria.</p>
         </div>
       </div>
-      <PromptExplorer prompts={allPrompts} categories={categories.map((item) => item.name)} initialCategory={category} />
+      <PromptExplorer
+        prompts={allPrompts}
+        categories={categories.map((item) => item.name)}
+        tools={options.tools}
+        initialCategory={category}
+      />
     </main>
   );
 }

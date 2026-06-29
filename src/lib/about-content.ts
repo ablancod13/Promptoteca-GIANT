@@ -14,8 +14,6 @@ export interface AboutContent {
   people: AboutPerson[];
 }
 
-export const ABOUT_CONTENT_KEY = "giant_about_content";
-
 export const DEFAULT_ABOUT_CONTENT: AboutContent = {
   title: "Quiénes somos",
   intro:

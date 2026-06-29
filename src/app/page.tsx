@@ -3,10 +3,16 @@ import { ArrowRight, Award, BookOpen, Heart, Sparkles, TrendingUp, UsersRound } 
 import { AboutContentClient } from "@/components/AboutContentClient";
 import { HomeRankingGrid } from "@/components/HomeRankingGrid";
 import { MetricStrip } from "@/components/MetricStrip";
+import { getAboutContent } from "@/lib/about-repository";
 import { getCategorySummary, getHomeStats, listPrompts } from "@/lib/repository";
 
 export default async function HomePage() {
-  const [stats, categories, prompts] = await Promise.all([getHomeStats(), getCategorySummary(), listPrompts()]);
+  const [stats, categories, prompts, aboutContent] = await Promise.all([
+    getHomeStats(),
+    getCategorySummary(),
+    listPrompts(),
+    getAboutContent()
+  ]);
 
   return (
     <main className="page">
@@ -30,9 +36,7 @@ export default async function HomePage() {
         <div className="side-panel stack">
           <span className="badge teal">Comunidad GIANT-SEIMC</span>
           <h2>Prompts curados por especialistas</h2>
-          <p className="muted">
-            Una biblioteca viva: los mejores aportes ganan visibilidad, puntos y reconocimiento.
-          </p>
+          <p className="muted">Una biblioteca viva: los mejores aportes ganan visibilidad, puntos y reconocimiento.</p>
           <div className="progress-bar">
             <span style={{ width: "72%" }} />
           </div>
@@ -45,13 +49,13 @@ export default async function HomePage() {
           metrics={[
             { label: "Prompts publicados", value: stats.totalPrompts },
             { label: "Validados GIANT", value: stats.validatedByGiant },
-            { label: "Copias registradas", value: stats.totalCopies },
+            { label: "Usos registrados", value: stats.totalCopies },
             { label: "Favoritos guardados", value: stats.totalFavorites }
           ]}
         />
       </section>
 
-      <AboutContentClient variant="home" />
+      <AboutContentClient content={aboutContent} variant="home" />
 
       <section className="section">
         <div className="section-head">

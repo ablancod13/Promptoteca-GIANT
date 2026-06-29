@@ -1,31 +1,13 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { DEFAULT_ABOUT_CONTENT, ABOUT_CONTENT_KEY, type AboutContent } from "@/lib/about-content";
+import { DEFAULT_ABOUT_CONTENT, type AboutContent } from "@/lib/about-content";
 
 interface AboutContentClientProps {
+  content?: AboutContent;
   variant?: "page" | "home";
 }
 
-export function AboutContentClient({ variant = "page" }: AboutContentClientProps) {
-  const [content, setContent] = useState<AboutContent>(DEFAULT_ABOUT_CONTENT);
-
-  useEffect(() => {
-    const refresh = () => {
-      const stored = window.localStorage.getItem(ABOUT_CONTENT_KEY);
-      setContent(stored ? (JSON.parse(stored) as AboutContent) : DEFAULT_ABOUT_CONTENT);
-    };
-    refresh();
-    window.addEventListener("giant:about-updated", refresh);
-    window.addEventListener("storage", refresh);
-    return () => {
-      window.removeEventListener("giant:about-updated", refresh);
-      window.removeEventListener("storage", refresh);
-    };
-  }, []);
-
+export function AboutContentClient({ content = DEFAULT_ABOUT_CONTENT, variant = "page" }: AboutContentClientProps) {
   if (variant === "home") {
     return (
       <section className="section about-home">
@@ -107,11 +89,7 @@ function PeoplePreview({ people }: { people: AboutContent["people"] }) {
     <div className="people-preview">
       {people.slice(0, 3).map((person) => (
         <div className="person-chip-card" key={person.id}>
-          {person.photoUrl ? (
-            <img src={person.photoUrl} alt="" />
-          ) : (
-            <span>{person.name.slice(0, 1)}</span>
-          )}
+          {person.photoUrl ? <img src={person.photoUrl} alt="" /> : <span>{person.name.slice(0, 1)}</span>}
           <div>
             <strong>{person.name}</strong>
             <small>{person.role}</small>

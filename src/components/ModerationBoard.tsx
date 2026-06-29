@@ -1,91 +1,112 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { CheckCircle2, EyeOff, FlaskConical, ShieldCheck, Trash2 } from "lucide-react";
+import {
+  deletePromptAction,
+  moderatePromptStatusAction,
+  resolveReportAction,
+  togglePromptExperimentalAction,
+  togglePromptValidatedAction,
+  type ModerationReport
+} from "@/app/moderacion/actions";
 import type { Prompt, ReviewStatus } from "@/lib/types";
 
-interface LocalReport {
-  id: string;
-  promptId: string;
-  promptSlug?: string;
-  promptTitle?: string;
-  createdAt: string;
-  reason: string;
-  status?: "open" | "resolved";
-}
-
-export function ModerationBoard({ prompts, allPrompts }: { prompts: Prompt[]; allPrompts: Prompt[] }) {
+export function ModerationBoard({
+  prompts,
+  reports
+}: {
+  prompts: Prompt[];
+  reports: ModerationReport[];
+}) {
   const [items, setItems] = useState(prompts);
-  const [reports, setReports] = useState<LocalReport[]>([]);
+  const [reportItems, setReportItems] = useState(reports);
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    const refreshReports = () => {
-      const stored = window.localStorage.getItem("giant_reports");
-      setReports(stored ? (JSON.parse(stored) as LocalReport[]).filter((report) => report.status !== "resolved") : []);
-    };
-    refreshReports();
-    window.addEventListener("giant:reports-updated", refreshReports);
-    window.addEventListener("storage", refreshReports);
-    return () => {
-      window.removeEventListener("giant:reports-updated", refreshReports);
-      window.removeEventListener("storage", refreshReports);
-    };
-  }, []);
-
-  function setStatus(id: string, status: ReviewStatus) {
-    setItems((current) =>
-      current
-        .map((prompt) => (prompt.id === id ? { ...prompt, reviewStatus: status } : prompt))
-        .filter((prompt) => prompt.id !== id)
-    );
+  function setStatus(prompt: Prompt, status: ReviewStatus) {
+    startTransition(async () => {
+      const result = await moderatePromptStatusAction(prompt.id, status);
+      setMessage(result.message);
+      if (result.ok) {
+        setItems((current) => current.filter((item) => item.id !== prompt.id));
+      }
+    });
   }
 
-  function toggleExperimental(id: string) {
-    setItems((current) => current.map((prompt) => (prompt.id === id ? { ...prompt, experimental: !prompt.experimental } : prompt)));
+  function deletePrompt(prompt: Prompt) {
+    startTransition(async () => {
+      const result = await deletePromptAction(prompt.id);
+      setMessage(result.message);
+      if (result.ok) {
+        setItems((current) => current.filter((item) => item.id !== prompt.id));
+        setReportItems((current) => current.filter((report) => report.promptId !== prompt.id));
+      }
+    });
   }
 
-  function toggleValidated(id: string) {
-    setItems((current) => current.map((prompt) => (prompt.id === id ? { ...prompt, validatedByGiant: !prompt.validatedByGiant } : prompt)));
+  function toggleExperimental(prompt: Prompt) {
+    startTransition(async () => {
+      const result = await togglePromptExperimentalAction(prompt.id);
+      setMessage(result.message);
+      if (result.ok) {
+        setItems((current) => current.map((item) => (item.id === prompt.id ? { ...item, experimental: !item.experimental } : item)));
+      }
+    });
   }
 
-  function resolveReport(id: string) {
-    const stored = window.localStorage.getItem("giant_reports");
-    const current = stored ? (JSON.parse(stored) as LocalReport[]) : [];
-    const next = current.map((report) => (report.id === id ? { ...report, status: "resolved" as const } : report));
-    window.localStorage.setItem("giant_reports", JSON.stringify(next));
-    setReports(next.filter((report) => report.status !== "resolved"));
+  function toggleValidated(prompt: Prompt) {
+    startTransition(async () => {
+      const result = await togglePromptValidatedAction(prompt.id);
+      setMessage(result.message);
+      if (result.ok) {
+        setItems((current) =>
+          current.map((item) => (item.id === prompt.id ? { ...item, validatedByGiant: !item.validatedByGiant } : item))
+        );
+      }
+    });
+  }
+
+  function resolveReport(reportId: string) {
+    startTransition(async () => {
+      const result = await resolveReportAction(reportId);
+      setMessage(result.message);
+      if (result.ok) {
+        setReportItems((current) => current.filter((report) => report.id !== reportId));
+      }
+    });
   }
 
   return (
     <div className="stack">
-      {reports.length ? (
+      {message ? <div className="callout">{message}</div> : null}
+      {reportItems.length ? (
         <section className="table-panel stack">
           <div className="section-head compact">
             <h2>Reportes recientes</h2>
-            <span className="badge rose">{reports.length}</span>
+            <span className="badge rose">{reportItems.length}</span>
           </div>
-          {reports.map((report) => {
-            const prompt = allPrompts.find((item) => item.id === report.promptId);
-            const slug = report.promptSlug ?? prompt?.slug;
-            return (
-              <article className="report-row" key={report.id}>
-                <div>
-                  {slug ? (
-                    <Link href={`/moderacion/prompts/${slug}`} target="_blank">
-                      <strong>{report.promptTitle ?? prompt?.title ?? "Prompt reportado"}</strong>
-                    </Link>
-                  ) : (
-                    <strong>{report.promptTitle ?? "Prompt reportado"}</strong>
-                  )}
-                  <p className="muted">{report.reason} · {new Date(report.createdAt).toLocaleDateString("es-ES")}</p>
-                </div>
-                <button className="button secondary" type="button" onClick={() => resolveReport(report.id)}>
-                  Revisado
-                </button>
-              </article>
-            );
-          })}
+          {reportItems.map((report) => (
+            <article className="report-row" key={report.id}>
+              <div>
+                {report.promptSlug ? (
+                  <Link href={`/moderacion/prompts/${report.promptSlug}`} target="_blank">
+                    <strong>{report.promptTitle}</strong>
+                  </Link>
+                ) : (
+                  <strong>{report.promptTitle}</strong>
+                )}
+                <p className="muted">
+                  {report.reason} · {new Date(report.createdAt).toLocaleDateString("es-ES")}
+                </p>
+                {report.details ? <p className="muted">{report.details}</p> : null}
+              </div>
+              <button className="button secondary" type="button" onClick={() => resolveReport(report.id)} disabled={isPending}>
+                Revisado
+              </button>
+            </article>
+          ))}
         </section>
       ) : null}
 
@@ -120,19 +141,25 @@ export function ModerationBoard({ prompts, allPrompts }: { prompts: Prompt[]; al
                 </td>
                 <td>
                   <div className="action-row">
-                    <button className="icon-button" title="Aprobar" type="button" onClick={() => setStatus(prompt.id, "approved")}>
+                    <button className="icon-button" title="Aprobar" type="button" onClick={() => setStatus(prompt, "approved")} disabled={isPending}>
                       <CheckCircle2 size={18} />
                     </button>
-                    <button className="icon-button" title="Marcar o desmarcar experimental" type="button" onClick={() => toggleExperimental(prompt.id)}>
+                    <button
+                      className="icon-button"
+                      title="Marcar o desmarcar experimental"
+                      type="button"
+                      onClick={() => toggleExperimental(prompt)}
+                      disabled={isPending}
+                    >
                       <FlaskConical size={18} />
                     </button>
-                    <button className="icon-button" title="Ocultar" type="button" onClick={() => setStatus(prompt.id, "hidden")}>
+                    <button className="icon-button" title="Ocultar" type="button" onClick={() => setStatus(prompt, "hidden")} disabled={isPending}>
                       <EyeOff size={18} />
                     </button>
-                    <button className="icon-button" title="Eliminar" type="button" onClick={() => setStatus(prompt.id, "rejected")}>
+                    <button className="icon-button" title="Eliminar" type="button" onClick={() => deletePrompt(prompt)} disabled={isPending}>
                       <Trash2 size={18} />
                     </button>
-                    <button className="icon-button" title="Validar GIANT" type="button" onClick={() => toggleValidated(prompt.id)}>
+                    <button className="icon-button" title="Validar GIANT" type="button" onClick={() => toggleValidated(prompt)} disabled={isPending}>
                       <ShieldCheck size={18} />
                     </button>
                   </div>

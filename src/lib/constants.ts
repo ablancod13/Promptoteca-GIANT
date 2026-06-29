@@ -1,26 +1,26 @@
 import type { Level, PromptTool } from "@/lib/types";
 
 export const INITIAL_CATEGORIES = [
-  "Analisis de datos",
-  "Bioinformatica",
-  "Comunicacion cientifica",
+  "Análisis de datos",
+  "Bioinformática",
+  "Comunicación científica",
   "Docencia",
   "Enfermedades infecciosas",
-  "Gestion de correo electronico",
+  "Gestión de correo electrónico",
   "Herramientas digitales",
-  "Investigacion",
-  "Lectura critica",
-  "Microbiologia clinica",
+  "Investigación",
+  "Lectura crítica",
+  "Microbiología clínica",
   "Presentaciones",
   "PROA",
-  "Preparacion de sesiones clinicas",
-  "Productividad clinica",
+  "Preparación de sesiones clínicas",
+  "Productividad clínica",
   "Productividad en laboratorio",
-  "Protocolos y guias clinicas",
-  "Redaccion cientifica",
+  "Protocolos y guías clínicas",
+  "Redacción científica",
   "Redes sociales profesionales",
-  "Revision bibliografica",
-  "Simulacion clinica"
+  "Revisión bibliográfica",
+  "Simulación clínica"
 ] as const;
 
 export const RECOMMENDED_TOOLS: PromptTool[] = [
@@ -65,9 +65,9 @@ export const LEVELS: Level[] = [
   { level: 3, minXp: 150, maxXp: 349, name: "Contribuidor/a" },
   { level: 4, minXp: 350, maxXp: 749, name: "Arquitecto/a de Prompts" },
   { level: 5, minXp: 750, maxXp: 1499, name: "Referente GIANT" },
-  { level: 6, minXp: 1500, maxXp: 2999, name: "Maestro/a Promptologo/a" },
+  { level: 6, minXp: 1500, maxXp: 2999, name: "Maestro/a Promptólogo/a" },
   { level: 7, minXp: 3000, maxXp: 5999, name: "Leyenda GIANT" },
-  { level: 8, minXp: 6000, maxXp: 9999, name: "Oraculo de IA Clinica" },
+  { level: 8, minXp: 6000, maxXp: 9999, name: "Oráculo de IA Clínica" },
   { level: 9, minXp: 10000, maxXp: null, name: "Embajador/a GIANT" }
 ];
 
@@ -112,13 +112,7 @@ export const TAXONOMY_STORAGE_KEYS = {
   models: "giant_moderator_models"
 } as const;
 
-export const INTELLIGENCE_LEVELS = [
-  "Bajo",
-  "Medio",
-  "Alto",
-  "Muy alto",
-  "Extremadamente alto"
-];
+export const INTELLIGENCE_LEVELS = ["Bajo", "Medio", "Alto", "Muy alto", "Extremadamente alto"];
 
 export const POINTS_BY_ACTION = {
   profile_completed: 5,

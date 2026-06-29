@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { canModerateAction } from "@/app/moderacion/actions";
 import { canModerate, getLocalUser } from "@/lib/local-user";
 
 export function ModerationGate({ children }: { children: React.ReactNode }) {
@@ -9,6 +10,7 @@ export function ModerationGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setAllowed(canModerate(getLocalUser()));
+    canModerateAction().then(setAllowed);
   }, []);
 
   if (allowed === null) {

@@ -1,11 +1,16 @@
 import { CategoryManager } from "@/components/CategoryManager";
 import { ModerationGate } from "@/components/ModerationGate";
 import { ModerationBoard } from "@/components/ModerationBoard";
-import { INITIAL_CATEGORIES } from "@/lib/constants";
+import { listOpenReportsAction } from "@/app/moderacion/actions";
+import { listTaxonomyAction } from "@/app/moderacion/taxonomy-actions";
 import { listPrompts } from "@/lib/repository";
 
 export default async function ModerationPage() {
-  const [prompts, allPrompts] = await Promise.all([listPrompts({ pendingOnly: true }), listPrompts()]);
+  const [prompts, reports, taxonomy] = await Promise.all([
+    listPrompts({ pendingOnly: true }),
+    listOpenReportsAction(),
+    listTaxonomyAction()
+  ]);
 
   return (
     <ModerationGate>
@@ -18,8 +23,8 @@ export default async function ModerationPage() {
           </div>
         </div>
         <div className="stack">
-          <CategoryManager initialCategories={[...INITIAL_CATEGORIES].sort((a, b) => a.localeCompare(b, "es"))} />
-          <ModerationBoard prompts={prompts} allPrompts={allPrompts} />
+          <CategoryManager initialState={taxonomy} />
+          <ModerationBoard prompts={prompts} reports={reports} />
         </div>
       </main>
     </ModerationGate>

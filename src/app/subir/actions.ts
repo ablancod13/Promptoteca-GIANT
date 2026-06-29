@@ -47,14 +47,8 @@ export async function submitPromptAction(payload: SubmitPromptPayload): Promise<
   const { data: profile, error: profileError } = await admin.from("profiles").select("*").eq("id", authData.user.id).single();
   if (profileError || !profile) return { ok: false, message: "No se encontro tu perfil." };
 
-  const { data: category, error: categoryError } = await admin
-    .from("categories")
-    .select("id,name")
-    .eq("name", payload.category)
-    .eq("status", "active")
-    .single();
-
-  if (categoryError || !category) return { ok: false, message: "La categoria seleccionada no esta disponible." };
+  const category = await ensureCategory(admin, payload.category, authData.user.id);
+  if (!category.id) return { ok: false, message: "La categoría seleccionada no está disponible." };
 
   const slug = await createUniqueSlug(admin, slugify(payload.title) || "prompt");
   const promptInsert = {
@@ -172,6 +166,42 @@ async function createUniqueSlug(admin: NonNullable<ReturnType<typeof createSupab
     if (!data) return slug;
   }
   return `${baseSlug}-${Date.now()}`;
+}
+
+async function ensureCategory(admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>, name: string, userId: string) {
+  const cleanName = name.trim().replace(/\s+/g, " ");
+  const slug = slugify(cleanName) || "categoria";
+
+  const { data: existingByName } = await admin
+    .from("categories")
+    .select("id,name")
+    .eq("name", cleanName)
+    .maybeSingle();
+  if (existingByName) return existingByName;
+
+  const { data: existingBySlug } = await admin
+    .from("categories")
+    .select("id,name")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (existingBySlug) return existingBySlug;
+
+  const { data, error } = await admin
+    .from("categories")
+    .insert({
+      name: cleanName,
+      slug,
+      status: "active",
+      created_by: userId,
+      approved_by: userId
+    })
+    .select("id,name")
+    .single();
+
+  if (!error && data) return data;
+
+  const { data: fallback } = await admin.from("categories").select("id,name").eq("slug", slug).maybeSingle();
+  return fallback ?? { id: "", name: cleanName };
 }
 
 async function awardPromptSubmissionPoints(

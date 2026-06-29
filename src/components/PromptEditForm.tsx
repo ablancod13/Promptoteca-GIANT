@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { Save, ShieldCheck } from "lucide-react";
+import { saveModeratedPromptAction } from "@/app/moderacion/actions";
 import { canModerate, getLocalUser } from "@/lib/local-user";
 import type { Prompt } from "@/lib/types";
 
 export function PromptEditForm({ prompt, moderation = false }: { prompt: Prompt; moderation?: boolean }) {
   const [message, setMessage] = useState("");
   const [canApproveDirectly, setCanApproveDirectly] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setCanApproveDirectly(canModerate(getLocalUser()));
@@ -17,23 +19,24 @@ export function PromptEditForm({ prompt, moderation = false }: { prompt: Prompt;
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const payload = {
-      id: `edit-${Date.now()}`,
-      promptId: prompt.id,
-      title: String(form.get("title")),
-      summary: String(form.get("summary")),
-      content: String(form.get("content")),
-      category: String(form.get("category")),
-      experimental: form.get("experimental") === "on",
-      validatedByGiant: form.get("validatedByGiant") === "on",
-      status: canApproveDirectly || moderation ? "approved" : "pending_review",
-      createdAt: new Date().toISOString()
-    };
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    const approve = moderation || submitter?.value === "approve";
 
-    const existing = window.localStorage.getItem("giant_prompt_edits");
-    const edits = existing ? (JSON.parse(existing) as unknown[]) : [];
-    window.localStorage.setItem("giant_prompt_edits", JSON.stringify([...edits, payload]));
-    setMessage(payload.status === "approved" ? "Cambios guardados y aprobados." : "Edición enviada a revisión.");
+    startTransition(async () => {
+      const result = await saveModeratedPromptAction({
+        promptId: prompt.id,
+        slug: prompt.slug,
+        title: String(form.get("title") ?? ""),
+        summary: String(form.get("summary") ?? ""),
+        content: String(form.get("content") ?? ""),
+        category: String(form.get("category") ?? ""),
+        experimental: form.get("experimental") === "on",
+        validatedByGiant: form.get("validatedByGiant") === "on",
+        approve
+      });
+
+      setMessage(result.message);
+    });
   }
 
   return (
@@ -67,11 +70,11 @@ export function PromptEditForm({ prompt, moderation = false }: { prompt: Prompt;
         </label>
       </div>
       <div className="action-row">
-        <button className="button primary" type="submit">
+        <button className="button primary" type="submit" name="intent" value="save" disabled={isPending}>
           <Save size={17} /> Guardar cambios
         </button>
         {canApproveDirectly || moderation ? (
-          <button className="button accent" type="submit">
+          <button className="button accent" type="submit" name="intent" value="approve" disabled={isPending}>
             <ShieldCheck size={17} /> Guardar y aprobar
           </button>
         ) : null}

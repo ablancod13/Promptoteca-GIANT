@@ -48,6 +48,18 @@
       "exportedName": "registerTemplateUseAction",
       "filename": "src/app/prompts/actions.ts"
     },
+    "704448dcdb90e3e5672931d525f56ff33555c4a5c2": {
+      "workers": {
+        "app/prompts/[slug]/page": {
+          "moduleId": 94189,
+          "async": false,
+          "exportedName": "reportPromptAction",
+          "filename": "src/app/prompts/actions.ts"
+        }
+      },
+      "exportedName": "reportPromptAction",
+      "filename": "src/app/prompts/actions.ts"
+    },
     "4019623c6485537adacb95a28ae00aa5f5bd21b953": {
       "workers": {
         "app/prompts/[slug]/page": {

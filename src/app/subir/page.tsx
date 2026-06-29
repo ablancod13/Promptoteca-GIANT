@@ -6,7 +6,12 @@ export default async function SubmitPromptPage() {
 
   return (
     <main className="page page-narrow">
-      <SubmissionForm initialCategories={options.categories} initialTools={options.tools} initialModels={options.models} />
+      <SubmissionForm
+        initialCategories={options.categories}
+        initialTools={options.tools}
+        initialModels={options.models}
+        initialModelOptions={options.modelOptions}
+      />
     </main>
   );
 }

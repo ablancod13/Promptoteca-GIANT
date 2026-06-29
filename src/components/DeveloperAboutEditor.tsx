@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { ImagePlus, Plus, Save, Trash2 } from "lucide-react";
-import { ABOUT_CONTENT_KEY, DEFAULT_ABOUT_CONTENT, type AboutContent, type AboutPerson } from "@/lib/about-content";
+import { getAboutContentAction, saveAboutContentAction } from "@/app/desarrollador/actions";
+import { DEFAULT_ABOUT_CONTENT, type AboutContent, type AboutPerson } from "@/lib/about-content";
 
 export function DeveloperAboutEditor() {
   const [content, setContent] = useState<AboutContent>(DEFAULT_ABOUT_CONTENT);
   const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(ABOUT_CONTENT_KEY);
-    setContent(stored ? (JSON.parse(stored) as AboutContent) : DEFAULT_ABOUT_CONTENT);
+    getAboutContentAction().then(setContent);
   }, []);
 
   function patchContent<K extends keyof AboutContent>(key: K, value: AboutContent[K]) {
@@ -48,14 +49,20 @@ export function DeveloperAboutEditor() {
 
   async function uploadPhoto(id: string, file: File | null) {
     if (!file) return;
+    if (file.size > 250_000) {
+      setMessage("La imagen debe pesar menos de 250 KB.");
+      return;
+    }
     const dataUrl = await fileToDataUrl(file);
     patchPerson(id, { photoUrl: dataUrl });
   }
 
   function save() {
-    window.localStorage.setItem(ABOUT_CONTENT_KEY, JSON.stringify(content));
-    window.dispatchEvent(new CustomEvent("giant:about-updated"));
-    setMessage("Contenido de Quiénes somos guardado.");
+    setMessage("");
+    startTransition(async () => {
+      const result = await saveAboutContentAction(content);
+      setMessage(result.message);
+    });
   }
 
   return (
@@ -122,8 +129,8 @@ export function DeveloperAboutEditor() {
           </article>
         ))}
       </div>
-      <button className="button primary" type="button" onClick={save}>
-        <Save size={16} /> Guardar Quiénes somos
+      <button className="button primary" type="button" onClick={save} disabled={isPending}>
+        <Save size={16} /> {isPending ? "Guardando..." : "Guardar Quiénes somos"}
       </button>
       {message ? <div className="callout">{message}</div> : null}
     </section>

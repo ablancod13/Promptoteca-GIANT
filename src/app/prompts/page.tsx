@@ -1,5 +1,5 @@
 import { PromptExplorer } from "@/components/PromptExplorer";
-import { getCategorySummary, listPrompts } from "@/lib/repository";
+import { getCategorySummary, listPrompts, listSubmissionOptions } from "@/lib/repository";
 
 export default async function PromptsPage({
   searchParams
@@ -7,7 +7,7 @@ export default async function PromptsPage({
   searchParams?: Promise<{ autor?: string; author?: string }>;
 }) {
   const params = (await searchParams) ?? {};
-  const [prompts, categories] = await Promise.all([listPrompts(), getCategorySummary()]);
+  const [prompts, categories, options] = await Promise.all([listPrompts(), getCategorySummary(), listSubmissionOptions()]);
 
   return (
     <main className="page">
@@ -21,6 +21,7 @@ export default async function PromptsPage({
       <PromptExplorer
         prompts={prompts}
         categories={categories.map((category) => category.name)}
+        tools={options.tools}
         initialAuthor={params.autor ?? params.author ?? ""}
       />
     </main>
