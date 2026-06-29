@@ -133,19 +133,45 @@ button {
   right: 0;
   top: 46px;
   display: grid;
-  min-width: 220px;
+  min-width: 320px;
+  max-width: min(420px, calc(100vw - 24px));
   gap: 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 12px;
   background: var(--surface);
   box-shadow: var(--shadow);
+  z-index: 30;
 }
 
-.notification-menu span {
+.notification-menu-head,
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.notification-item {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+
+.notification-item div {
+  display: grid;
+  gap: 3px;
+}
+
+.notification-menu span,
+.notification-item strong {
   color: var(--giant-text-secondary);
   font-size: 0.9rem;
   font-weight: 700;
+}
+
+.notification-item small {
+  color: var(--muted);
+  font-size: 0.75rem;
 }
 
 .nav-link,
@@ -599,15 +625,27 @@ p {
   align-items: center;
   gap: 6px;
   border: 0;
-  padding: 0;
+  min-height: 36px;
+  border-radius: 999px;
+  padding: 6px 8px;
   color: var(--muted);
   background: transparent;
   font-weight: 800;
+  cursor: pointer;
+  transition: color 140ms ease, background 140ms ease, transform 140ms ease;
+}
+
+.heart-button:hover {
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
 }
 
 .heart-button.liked {
   color: #dc2626;
-  animation: heart-pop 260ms ease;
+}
+
+.heart-button.heart-pulse svg {
+  animation: heart-pop 340ms ease;
 }
 
 @keyframes heart-pop {
@@ -1291,6 +1329,52 @@ p {
   padding-left: 14px;
 }
 
+.join-giant-callout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid rgba(236, 73, 13, 0.28);
+  border-radius: 8px;
+  padding: 20px;
+  background: linear-gradient(90deg, #fff7ed, #ffffff);
+}
+
+.join-giant-callout p {
+  margin: 0;
+  color: var(--giant-text-secondary);
+  font-weight: 650;
+}
+
+.report-box {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(225, 29, 72, 0.18);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(225, 29, 72, 0.04);
+}
+
+.moderation-actions {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.account-danger-zone {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 8px 0 0;
+}
+
+.subtle-danger {
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  opacity: 0.78;
+}
+
 @media (max-width: 980px) {
   .hero,
   .about-hero,
@@ -1347,6 +1431,12 @@ p {
   }
 
   .section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .join-giant-callout,
+  .account-danger-zone {
     align-items: flex-start;
     flex-direction: column;
   }

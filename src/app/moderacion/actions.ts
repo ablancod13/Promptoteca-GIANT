@@ -30,9 +30,7 @@ export interface ModerationPromptUpdatePayload {
   approve: boolean;
 }
 
-type ModerationResult =
-  | { ok: true; message: string }
-  | { ok: false; message: string };
+type ModerationResult = { ok: true; message: string } | { ok: false; message: string };
 
 export async function canModerateAction(): Promise<boolean> {
   const context = await getModerationContext();
@@ -66,32 +64,44 @@ export async function moderatePromptStatusAction(promptId: string, status: Revie
   if (!context.ok) return context;
 
   const { data: prompt } = await context.admin.from("prompts").select("slug,review_status,author_id").eq("id", promptId).single();
-  if (!prompt) return { ok: false, message: "No se encontro el prompt." };
+  if (!prompt) return { ok: false, message: "No se encontró el prompt." };
 
   await context.admin.from("prompts").update({ review_status: status }).eq("id", promptId);
   await logModerationAction(context.admin, promptId, context.userId, `status:${status}`, prompt.review_status, status);
+
   if (status === "approved" && prompt.author_id) {
-    await awardPointsOnce(
-      context.admin,
-      String(prompt.author_id),
-      "prompt_approved",
-      POINTS_BY_ACTION.prompt_approved,
-      promptId,
-      `prompt-approved:${promptId}`
-    );
+    await awardPointsOnce(context.admin, String(prompt.author_id), "prompt_approved", POINTS_BY_ACTION.prompt_approved, promptId, `prompt-approved:${promptId}`);
+    await insertNotification(context.admin, String(prompt.author_id), "prompt_approved", "Prompt aprobado", "Tu prompt ha sido aprobado.", { promptId });
+  }
+
+  if (status === "archived" && prompt.author_id) {
+    await insertNotification(context.admin, String(prompt.author_id), "prompt_archived", "Prompt archivado", "Uno de tus prompts ha sido archivado.", { promptId });
   }
 
   revalidateModerationPaths(String(prompt.slug));
-  return { ok: true, message: status === "approved" ? "Prompt aprobado." : status === "hidden" ? "Prompt ocultado." : "Estado actualizado." };
+  return {
+    ok: true,
+    message:
+      status === "approved"
+        ? "Prompt aprobado."
+        : status === "hidden"
+          ? "Prompt ocultado."
+          : status === "archived"
+            ? "Prompt archivado."
+            : "Estado actualizado."
+  };
 }
 
 export async function deletePromptAction(promptId: string): Promise<ModerationResult> {
   const context = await getModerationContext();
   if (!context.ok) return context;
 
-  const { data: prompt } = await context.admin.from("prompts").select("slug,review_status").eq("id", promptId).single();
-  if (!prompt) return { ok: false, message: "No se encontro el prompt." };
+  const { data: prompt } = await context.admin.from("prompts").select("slug,review_status,author_id").eq("id", promptId).single();
+  if (!prompt) return { ok: false, message: "No se encontró el prompt." };
 
+  if (prompt.author_id) {
+    await insertNotification(context.admin, String(prompt.author_id), "prompt_deleted", "Prompt eliminado", "Uno de tus prompts ha sido eliminado.", { promptId });
+  }
   await logModerationAction(context.admin, promptId, context.userId, "delete", prompt.review_status, "rejected");
   await context.admin.from("prompts").delete().eq("id", promptId);
 
@@ -104,7 +114,7 @@ export async function togglePromptExperimentalAction(promptId: string): Promise<
   if (!context.ok) return context;
 
   const { data: prompt } = await context.admin.from("prompts").select("slug,experimental").eq("id", promptId).single();
-  if (!prompt) return { ok: false, message: "No se encontro el prompt." };
+  if (!prompt) return { ok: false, message: "No se encontró el prompt." };
 
   await context.admin.from("prompts").update({ experimental: !prompt.experimental }).eq("id", promptId);
   await logModerationAction(context.admin, promptId, context.userId, "toggle_experimental", null, null);
@@ -117,20 +127,15 @@ export async function togglePromptValidatedAction(promptId: string): Promise<Mod
   if (!context.ok) return context;
 
   const { data: prompt } = await context.admin.from("prompts").select("slug,validated_by_giant,author_id").eq("id", promptId).single();
-  if (!prompt) return { ok: false, message: "No se encontro el prompt." };
+  if (!prompt) return { ok: false, message: "No se encontró el prompt." };
 
   const next = !prompt.validated_by_giant;
   await context.admin.from("prompts").update({ validated_by_giant: next }).eq("id", promptId);
   await logModerationAction(context.admin, promptId, context.userId, "toggle_validated_giant", null, null);
+
   if (next && prompt.author_id) {
-    await awardPointsOnce(
-      context.admin,
-      String(prompt.author_id),
-      "prompt_validated_giant",
-      POINTS_BY_ACTION.prompt_validated_giant,
-      promptId,
-      `prompt-validated:${promptId}`
-    );
+    await awardPointsOnce(context.admin, String(prompt.author_id), "prompt_validated_giant", POINTS_BY_ACTION.prompt_validated_giant, promptId, `prompt-validated:${promptId}`);
+    await insertNotification(context.admin, String(prompt.author_id), "prompt_validated", "Prompt validado por GIANT", "Uno de tus prompts ha sido validado por GIANT.", { promptId });
   }
 
   revalidateModerationPaths(String(prompt.slug));
@@ -155,19 +160,21 @@ export async function resolveReportAction(reportId: string): Promise<ModerationR
 }
 
 export async function saveModeratedPromptAction(payload: ModerationPromptUpdatePayload): Promise<ModerationResult> {
-  const context = await getModerationContext();
+  const context = await getPromptEditContext(payload.promptId);
   if (!context.ok) return context;
 
   const { data: current } = await context.admin
     .from("prompts")
-    .select("slug,review_status,version_current,primary_category_id")
+    .select("slug,review_status,version_current,author_id")
     .eq("id", payload.promptId)
     .single();
-  if (!current) return { ok: false, message: "No se encontro el prompt." };
+  if (!current) return { ok: false, message: "No se encontró el prompt." };
 
   const category = await ensureCategory(context.admin, payload.category, context.userId);
+  if (!category.id) return { ok: false, message: "No se pudo resolver la categoría." };
+
   const nextVersion = Number(current.version_current ?? 1) + 1;
-  const nextStatus = payload.approve ? "approved" : String(current.review_status);
+  const nextStatus = context.isModerator && payload.approve ? "approved" : context.isModerator ? String(current.review_status) : "pending";
 
   await context.admin
     .from("prompts")
@@ -198,38 +205,81 @@ export async function saveModeratedPromptAction(payload: ModerationPromptUpdateP
     content: payload.content.trim(),
     summary: payload.summary.trim(),
     created_by: context.userId,
-    change_reason: payload.approve ? "Revisión y aprobación de moderación" : "Edición de moderación"
+    change_reason: context.isModerator
+      ? payload.approve
+        ? "Revisión y aprobación de moderación"
+        : "Edición de moderación"
+      : "Edición enviada por el autor"
   });
 
-  await logModerationAction(
-    context.admin,
-    payload.promptId,
-    context.userId,
-    payload.approve ? "edit_and_approve" : "edit",
-    current.review_status,
-    nextStatus as ReviewStatus
-  );
+  if (context.isModerator) {
+    await logModerationAction(
+      context.admin,
+      payload.promptId,
+      context.userId,
+      payload.approve ? "edit_and_approve" : "edit",
+      current.review_status,
+      nextStatus as ReviewStatus
+    );
+
+    if (current.author_id && String(current.author_id) !== context.userId) {
+      await insertNotification(context.admin, String(current.author_id), "prompt_modified", "Prompt modificado", "Un moderador ha modificado uno de tus prompts.", {
+        promptId: payload.promptId
+      });
+    }
+    if (payload.approve && current.author_id) {
+      await insertNotification(context.admin, String(current.author_id), "prompt_approved", "Prompt aprobado", "Tu prompt ha sido aprobado.", {
+        promptId: payload.promptId
+      });
+    }
+  }
 
   revalidateModerationPaths(payload.slug || String(current.slug));
-  return { ok: true, message: payload.approve ? "Cambios guardados y prompt aprobado." : "Cambios guardados." };
+  return {
+    ok: true,
+    message: context.isModerator
+      ? payload.approve
+        ? "Cambios guardados y prompt aprobado."
+        : "Cambios guardados."
+      : "Cambios enviados a revisión."
+  };
+}
+
+async function getPromptEditContext(promptId: string) {
+  const supabase = await createSupabaseServerClient();
+  const admin = createSupabaseAdminClient();
+  if (!supabase || !admin) return { ok: false as const, message: "Supabase no está configurado." };
+
+  const { data: authData } = await supabase.auth.getUser();
+  if (!authData.user) return { ok: false as const, message: "Inicia sesión para editar." };
+
+  const [{ data: profile }, { data: prompt }] = await Promise.all([
+    admin.from("profiles").select("platform_role,account_status").eq("id", authData.user.id).single(),
+    admin.from("prompts").select("author_id").eq("id", promptId).single()
+  ]);
+
+  const isModerator = profile?.account_status === "active" && ["moderator", "admin", "developer"].includes(String(profile.platform_role));
+  const isAuthor = prompt?.author_id && String(prompt.author_id) === authData.user.id;
+
+  if (!isModerator && !isAuthor) {
+    return { ok: false as const, message: "No tienes permisos para editar este prompt." };
+  }
+
+  return { ok: true as const, admin, userId: authData.user.id, isModerator };
 }
 
 async function getModerationContext() {
   const supabase = await createSupabaseServerClient();
   const admin = createSupabaseAdminClient();
-  if (!supabase || !admin) return { ok: false as const, message: "Supabase no esta configurado." };
+  if (!supabase || !admin) return { ok: false as const, message: "Supabase no está configurado." };
 
   const { data: authData } = await supabase.auth.getUser();
-  if (!authData.user) return { ok: false as const, message: "Inicia sesion para moderar." };
+  if (!authData.user) return { ok: false as const, message: "Inicia sesión para moderar." };
 
-  const { data: profile } = await admin
-    .from("profiles")
-    .select("platform_role,account_status")
-    .eq("id", authData.user.id)
-    .single();
+  const { data: profile } = await admin.from("profiles").select("platform_role,account_status").eq("id", authData.user.id).single();
 
   if (!profile || profile.account_status !== "active" || !["moderator", "admin", "developer"].includes(String(profile.platform_role))) {
-    return { ok: false as const, message: "No tienes permisos de moderacion." };
+    return { ok: false as const, message: "No tienes permisos de moderación." };
   }
 
   return { ok: true as const, admin, userId: authData.user.id };
@@ -280,6 +330,23 @@ async function logModerationAction(
   });
 }
 
+async function insertNotification(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  userId: string,
+  type: string,
+  title: string,
+  body: string,
+  metadata: Record<string, unknown> = {}
+) {
+  await admin.from("notifications").insert({
+    user_id: userId,
+    type,
+    title,
+    body,
+    metadata
+  });
+}
+
 async function awardPointsOnce(
   admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
   userId: string,
@@ -316,8 +383,10 @@ function revalidateModerationPaths(slug: string) {
   revalidatePath("/");
   revalidatePath("/prompts");
   revalidatePath("/moderacion");
+  revalidatePath("/perfil");
   if (slug) {
     revalidatePath(`/prompts/${slug}`);
+    revalidatePath(`/prompts/${slug}/editar`);
     revalidatePath(`/moderacion/prompts/${slug}`);
   }
 }

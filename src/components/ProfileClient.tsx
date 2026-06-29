@@ -2,14 +2,26 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
-import { Award, Camera, Edit3, Heart, LogOut, Save, ShieldCheck, Star, Trash2, Upload } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import {
+  Award,
+  Camera,
+  Edit3,
+  Heart,
+  LogOut,
+  Save,
+  Settings,
+  ShieldCheck,
+  Star,
+  Trash2,
+  Upload
+} from "lucide-react";
 import { deleteAccountAction, getCurrentProfileAction, logoutAction, updateProfileAction } from "@/app/auth/actions";
+import { listMyPromptContributionsAction, type PromptContribution } from "@/app/perfil/actions";
 import { PROFESSIONAL_ROLES } from "@/lib/constants";
 import { COUNTRIES_ES, SPAIN_AUTONOMOUS_COMMUNITIES } from "@/lib/registration-options";
 import { canDevelop, canModerate, LOCAL_USER_KEY, getLocalUser, saveLocalUser, type LocalUser } from "@/lib/local-user";
 import { getProgressToNextLevel } from "@/lib/gamification";
-import type { Prompt } from "@/lib/types";
 import { LevelAvatar } from "@/components/LevelAvatar";
 
 interface BadgeDefinition {
@@ -47,9 +59,11 @@ const LOCAL_ACCOUNT_KEYS = [
   "giant_xp_ledger"
 ];
 
-export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
+export function ProfileClient() {
   const router = useRouter();
   const [user, setUser] = useState<LocalUser | null>(null);
+  const [contributed, setContributed] = useState<PromptContribution[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
   const [settingsCountry, setSettingsCountry] = useState("España");
   const [settingsRole, setSettingsRole] = useState(PROFESSIONAL_ROLES[0]);
   const [settingsMessage, setSettingsMessage] = useState("");
@@ -73,6 +87,9 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
       setSettingsCountry(remoteUser.country || "España");
       setSettingsRole(remoteUser.role || PROFESSIONAL_ROLES[0]);
     });
+    listMyPromptContributionsAction().then((items) => {
+      if (!cancelled) setContributed(items);
+    });
 
     window.addEventListener("giant:user-updated", refreshFromLocal);
     window.addEventListener("storage", refreshFromLocal);
@@ -84,7 +101,6 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
   }, []);
 
   const progress = getProgressToNextLevel(user?.xp ?? 0);
-  const contributed = useMemo(() => prompts.slice(0, 4), [prompts]);
   const earnedBadges = BADGES.filter((badge) => (user?.xp ?? 0) >= badge.minXp);
   const settingsIsSpain = isSpainCountry(settingsCountry);
 
@@ -154,6 +170,7 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
         setUser(result.user);
         setSettingsCountry(result.user.country || "España");
         setSettingsRole(result.user.role || PROFESSIONAL_ROLES[0]);
+        setContributed(await listMyPromptContributionsAction());
       }
     });
   }
@@ -218,119 +235,118 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
             <span style={{ width: `${progress.percent}%` }} />
           </div>
           <span className="muted">{progress.next ? `Siguiente: ${progress.next.name}` : "Nivel máximo"}</span>
-        </div>
-      </section>
-
-      <section className="table-panel stack">
-        <div className="section-head compact">
-          <h2>Configuración</h2>
           <div className="action-row">
+            <button className="button secondary" type="button" onClick={() => setShowSettings((current) => !current)}>
+              <Settings size={16} /> Modificar datos
+            </button>
             <button className="button secondary" type="button" onClick={logout} disabled={isPending}>
               <LogOut size={16} /> Cerrar sesión
             </button>
           </div>
         </div>
-        <form className="stack" onSubmit={saveSettings}>
-          <div className="grid three">
-            <label className="field">
-              <span>Nombre a mostrar</span>
-              <input className="input" name="displayName" defaultValue={user.displayName || user.name} required />
-            </label>
-            <label className="field">
-              <span>País de residencia</span>
-              <select
-                className="select"
-                name="country"
-                value={settingsCountry}
-                onChange={(event) => setSettingsCountry(event.target.value)}
-              >
-                {COUNTRIES_ES.map((country) => (
-                  <option value={country} key={country}>
-                    {country}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {settingsIsSpain ? (
+      </section>
+
+      {showSettings ? (
+        <section className="table-panel stack">
+          <div className="section-head compact">
+            <h2>Configuración</h2>
+          </div>
+          <form className="stack" onSubmit={saveSettings}>
+            <div className="grid three">
               <label className="field">
-                <span>Comunidad autónoma</span>
-                <select className="select" name="region" defaultValue={user.region ?? SPAIN_AUTONOMOUS_COMMUNITIES[0]}>
-                  {SPAIN_AUTONOMOUS_COMMUNITIES.map((region) => (
-                    <option value={region} key={region}>
-                      {region}
+                <span>Nombre a mostrar</span>
+                <input className="input" name="displayName" defaultValue={user.displayName || user.name} required />
+              </label>
+              <label className="field">
+                <span>País de residencia</span>
+                <select
+                  className="select"
+                  name="country"
+                  value={settingsCountry}
+                  onChange={(event) => setSettingsCountry(event.target.value)}
+                >
+                  {COUNTRIES_ES.map((country) => (
+                    <option value={country} key={country}>
+                      {country}
                     </option>
                   ))}
                 </select>
               </label>
-            ) : (
+              {settingsIsSpain ? (
+                <label className="field">
+                  <span>Comunidad autónoma</span>
+                  <select className="select" name="region" defaultValue={user.region ?? SPAIN_AUTONOMOUS_COMMUNITIES[0]}>
+                    {SPAIN_AUTONOMOUS_COMMUNITIES.map((region) => (
+                      <option value={region} key={region}>
+                        {region}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : (
+                <label className="field">
+                  <span>Ciudad</span>
+                  <input className="input" name="city" defaultValue={user.city ?? ""} />
+                </label>
+              )}
+            </div>
+            <div className="grid three">
               <label className="field">
-                <span>Ciudad</span>
-                <input className="input" name="city" defaultValue={user.city ?? ""} />
+                <span>Año de nacimiento</span>
+                <input className="input" value={user.birthYear ?? "No indicado"} disabled readOnly />
               </label>
-            )}
-          </div>
-          <div className="grid three">
-            <label className="field">
-              <span>Año de nacimiento</span>
-              <input className="input" value={user.birthYear ?? "No indicado"} disabled readOnly />
-            </label>
-            <label className="field">
-              <span>Rol profesional</span>
-              <select
-                className="select"
-                name="professionalRole"
-                value={settingsRole}
-                onChange={(event) => setSettingsRole(event.target.value)}
-              >
-                {PROFESSIONAL_ROLES.map((role) => (
-                  <option value={role} key={role}>
-                    {role}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Centro de trabajo</span>
-              <input className="input" name="institution" defaultValue={user.institution ?? ""} />
-            </label>
-          </div>
-          <div className="grid three">
-            <label className="field">
-              <span>Pertenencia a SEIMC</span>
-              <select className="select" name="seimcMember" defaultValue={user.seimcMember ?? ""}>
-                <option value="">Sin indicar</option>
-                <option value="si">Sí</option>
-                <option value="no">No</option>
-              </select>
-            </label>
-            <label className="field">
-              <span>Frecuencia de uso IA</span>
-              <input className="input" value={user.aiFrequency ?? "No indicado"} disabled readOnly />
-            </label>
-            <label className="field">
-              <span>Nivel autopercibido</span>
-              <input className="input" value={user.aiLevel ?? "No indicado"} disabled readOnly />
-            </label>
-          </div>
-          <div className="callout">
-            <strong>Datos no editables</strong>
-            <p className="muted">
-              Uso profesional de IA: {user.aiProfessionalUse ?? "No indicado"}. Herramientas utilizadas:{" "}
-              {user.aiTools?.length ? user.aiTools.join(", ") : "No indicado"}.
-            </p>
-          </div>
-          <div className="action-row">
+              <label className="field">
+                <span>Rol profesional</span>
+                <select
+                  className="select"
+                  name="professionalRole"
+                  value={settingsRole}
+                  onChange={(event) => setSettingsRole(event.target.value)}
+                >
+                  {PROFESSIONAL_ROLES.map((role) => (
+                    <option value={role} key={role}>
+                      {role}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field">
+                <span>Centro de trabajo</span>
+                <input className="input" name="institution" defaultValue={user.institution ?? ""} />
+              </label>
+            </div>
+            <div className="grid three">
+              <label className="field">
+                <span>Pertenencia a SEIMC</span>
+                <select className="select" name="seimcMember" defaultValue={user.seimcMember ?? ""}>
+                  <option value="">Sin indicar</option>
+                  <option value="si">Sí</option>
+                  <option value="no">No</option>
+                </select>
+              </label>
+              <label className="field">
+                <span>Frecuencia de uso IA</span>
+                <input className="input" value={user.aiFrequency ?? "No indicado"} disabled readOnly />
+              </label>
+              <label className="field">
+                <span>Nivel autopercibido</span>
+                <input className="input" value={user.aiLevel ?? "No indicado"} disabled readOnly />
+              </label>
+            </div>
+            <div className="callout">
+              <strong>Datos no editables</strong>
+              <p className="muted">
+                Uso profesional de IA: {user.aiProfessionalUse ?? "No indicado"}. Herramientas utilizadas:{" "}
+                {user.aiTools?.length ? user.aiTools.join(", ") : "No indicado"}.
+              </p>
+            </div>
             <button className="button primary" type="submit" disabled={isPending}>
               <Save size={16} /> Guardar configuración
             </button>
-            <button className="button danger" type="button" onClick={deleteAccount} disabled={isPending}>
-              <Trash2 size={16} /> {confirmDelete ? "Confirmar eliminación" : "Eliminar cuenta"}
-            </button>
-          </div>
-          {settingsMessage ? <div className="callout">{settingsMessage}</div> : null}
-          {confirmDelete ? <div className="callout warning">Pulsa de nuevo para confirmar la eliminación de la cuenta.</div> : null}
-        </form>
-      </section>
+            {settingsMessage ? <div className="callout">{settingsMessage}</div> : null}
+          </form>
+        </section>
+      ) : null}
 
       <section className="grid three">
         <div className="metric">
@@ -381,6 +397,7 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
           <thead>
             <tr>
               <th>Prompt</th>
+              <th>Estado</th>
               <th>Usos</th>
               <th>Favoritos</th>
               <th>Me gusta</th>
@@ -396,6 +413,9 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
                   </Link>
                   <p className="muted">{prompt.summary}</p>
                 </td>
+                <td>
+                  <span className="badge">{prompt.reviewStatus}</span>
+                </td>
                 <td>{prompt.copies}</td>
                 <td>
                   <Star size={15} /> {prompt.favorites}
@@ -410,6 +430,13 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
                 </td>
               </tr>
             ))}
+            {!contributed.length ? (
+              <tr>
+                <td colSpan={6}>
+                  <div className="empty-state">Aún no has compartido prompts.</div>
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
         <div className="callout">
@@ -436,6 +463,13 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
           </Link>
         </section>
       ) : null}
+
+      <section className="account-danger-zone">
+        <button className="button danger subtle-danger" type="button" onClick={deleteAccount} disabled={isPending}>
+          <Trash2 size={15} /> {confirmDelete ? "Confirmar eliminación" : "Eliminar cuenta"}
+        </button>
+        {confirmDelete ? <small className="muted">Pulsa de nuevo para confirmar la eliminación de la cuenta.</small> : null}
+      </section>
     </div>
   );
 }

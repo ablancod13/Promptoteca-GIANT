@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -12,10 +12,58 @@
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
     },
+    "0090db71646b79d0249d4cbb3f7b2fd9aef4a08a31": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 84322,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "deleteAllNotificationsAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "40f7cce949652620ccaf9972a4ad6077a95eae3354": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 84322,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "deleteNotificationAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "00b208efefee590914f1b080643217344504eaa595": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 84322,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "listNotificationsAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "000f0770c15afb6b5d07aa81349a10afe34cb8164c": {
+      "workers": {
+        "app/biblioteca/page": {
+          "moduleId": 84322,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "markAllNotificationsReadAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
     "609073884814e9c02bf0d932cb07b52433321e423b": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "createLibraryFolderAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -27,7 +75,7 @@
     "00212201e0b1dd06ccd97b64fc0c206851a8722b34": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "getLibraryStateAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -39,7 +87,7 @@
     "601a3368c6862296c0b4c80c38718d70cd3e52980b": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "moveFavoriteToFolderAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -51,7 +99,7 @@
     "40c6c00097c1eac6337cbd139981b112342a506884": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "removeLibraryFavoriteAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -63,7 +111,7 @@
     "40c1147da1b26506fc787a27e4302d8a440ac663c8": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "removeLibraryLikeAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -75,7 +123,7 @@
     "6022c86d2e23707910f147a4fe76557bff163de07d": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "savePrivateNoteAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -87,7 +135,7 @@
     "7001fc2ffcc302dad747a866e648e71b3b87a4e11f": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "savePrivatePromptVersionAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -99,7 +147,7 @@
     "60e0be61230b4fe1790a24cba83bf7b0f1ad00b0a6": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "updateLibraryFolderColorAction",
           "filename": "src/app/biblioteca/actions.ts"

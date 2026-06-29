@@ -3,115 +3,115 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/_not-found/page": {
-          "moduleId": 27691,
+          "moduleId": 30074,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/admin/page": {
-          "moduleId": 97686,
+          "moduleId": 35028,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/categorias/[slug]/page": {
-          "moduleId": 14711,
+          "moduleId": 50456,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/confirmar-cuenta/page": {
-          "moduleId": 28832,
+          "moduleId": 18083,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/legal/privacidad/page": {
-          "moduleId": 70290,
+          "moduleId": 5146,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/legal/terminos/page": {
-          "moduleId": 51872,
+          "moduleId": 16035,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/login/page": {
-          "moduleId": 41844,
+          "moduleId": 29617,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/moderacion/prompts/[slug]/page": {
-          "moduleId": 14259,
+          "moduleId": 72982,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/page": {
-          "moduleId": 93339,
+          "moduleId": 8685,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/perfil/page": {
-          "moduleId": 89711,
+          "moduleId": 72216,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/prompts/[slug]/editar/page": {
-          "moduleId": 68936,
+          "moduleId": 63775,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/prompts/page": {
-          "moduleId": 1474,
+          "moduleId": 61814,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/quienes-somos/page": {
-          "moduleId": 54599,
+          "moduleId": 95997,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/registro/page": {
-          "moduleId": 91232,
+          "moduleId": 76470,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/subir/page": {
-          "moduleId": 69127,
+          "moduleId": 89646,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -120,28 +120,508 @@
       "filename": "src/app/auth/actions.ts",
       "exportedName": "getCurrentProfileAction"
     },
+    "0090db71646b79d0249d4cbb3f7b2fd9aef4a08a31": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 30074,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/admin/page": {
+          "moduleId": 35028,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/biblioteca/page": {
+          "moduleId": 84322,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/categorias/[slug]/page": {
+          "moduleId": 50456,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/confirmar-cuenta/page": {
+          "moduleId": 18083,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/legal/privacidad/page": {
+          "moduleId": 5146,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/legal/terminos/page": {
+          "moduleId": 16035,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/login/page": {
+          "moduleId": 29617,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/moderacion/page": {
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 72982,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/page": {
+          "moduleId": 8685,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/perfil/page": {
+          "moduleId": 72216,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/[slug]/editar/page": {
+          "moduleId": 63775,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/[slug]/page": {
+          "moduleId": 26043,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/page": {
+          "moduleId": 61814,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/quienes-somos/page": {
+          "moduleId": 95997,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/registro/page": {
+          "moduleId": 76470,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/subir/page": {
+          "moduleId": 89646,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "filename": "src/app/notificaciones/actions.ts",
+      "exportedName": "deleteAllNotificationsAction"
+    },
+    "40f7cce949652620ccaf9972a4ad6077a95eae3354": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 30074,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/admin/page": {
+          "moduleId": 35028,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/biblioteca/page": {
+          "moduleId": 84322,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/categorias/[slug]/page": {
+          "moduleId": 50456,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/confirmar-cuenta/page": {
+          "moduleId": 18083,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/legal/privacidad/page": {
+          "moduleId": 5146,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/legal/terminos/page": {
+          "moduleId": 16035,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/login/page": {
+          "moduleId": 29617,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/moderacion/page": {
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 72982,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/page": {
+          "moduleId": 8685,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/perfil/page": {
+          "moduleId": 72216,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/[slug]/editar/page": {
+          "moduleId": 63775,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/[slug]/page": {
+          "moduleId": 26043,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/page": {
+          "moduleId": 61814,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/quienes-somos/page": {
+          "moduleId": 95997,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/registro/page": {
+          "moduleId": 76470,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/subir/page": {
+          "moduleId": 89646,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "filename": "src/app/notificaciones/actions.ts",
+      "exportedName": "deleteNotificationAction"
+    },
+    "00b208efefee590914f1b080643217344504eaa595": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 30074,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/admin/page": {
+          "moduleId": 35028,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/biblioteca/page": {
+          "moduleId": 84322,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/categorias/[slug]/page": {
+          "moduleId": 50456,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/confirmar-cuenta/page": {
+          "moduleId": 18083,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/legal/privacidad/page": {
+          "moduleId": 5146,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/legal/terminos/page": {
+          "moduleId": 16035,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/login/page": {
+          "moduleId": 29617,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/moderacion/page": {
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 72982,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/page": {
+          "moduleId": 8685,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/perfil/page": {
+          "moduleId": 72216,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/[slug]/editar/page": {
+          "moduleId": 63775,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/[slug]/page": {
+          "moduleId": 26043,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/page": {
+          "moduleId": 61814,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/quienes-somos/page": {
+          "moduleId": 95997,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/registro/page": {
+          "moduleId": 76470,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/subir/page": {
+          "moduleId": 89646,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "filename": "src/app/notificaciones/actions.ts",
+      "exportedName": "listNotificationsAction"
+    },
+    "000f0770c15afb6b5d07aa81349a10afe34cb8164c": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 30074,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/admin/page": {
+          "moduleId": 35028,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/biblioteca/page": {
+          "moduleId": 84322,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/categorias/[slug]/page": {
+          "moduleId": 50456,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/confirmar-cuenta/page": {
+          "moduleId": 18083,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/legal/privacidad/page": {
+          "moduleId": 5146,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/legal/terminos/page": {
+          "moduleId": 16035,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/login/page": {
+          "moduleId": 29617,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/moderacion/page": {
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 72982,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/page": {
+          "moduleId": 8685,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/perfil/page": {
+          "moduleId": 72216,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/[slug]/editar/page": {
+          "moduleId": 63775,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/[slug]/page": {
+          "moduleId": 26043,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/prompts/page": {
+          "moduleId": 61814,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/quienes-somos/page": {
+          "moduleId": 95997,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/registro/page": {
+          "moduleId": 76470,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        },
+        "app/subir/page": {
+          "moduleId": 89646,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "filename": "src/app/notificaciones/actions.ts",
+      "exportedName": "markAllNotificationsReadAction"
+    },
     "4040b50584c929a78a855a82229984eb0bb0034bc9": {
       "workers": {
         "app/categorias/[slug]/page": {
-          "moduleId": 14711,
+          "moduleId": 50456,
           "async": false,
           "exportedName": "getPromptInteractionStateAction",
           "filename": "src/app/prompts/actions.ts"
         },
         "app/page": {
-          "moduleId": 93339,
+          "moduleId": 8685,
           "async": false,
           "exportedName": "getPromptInteractionStateAction",
           "filename": "src/app/prompts/actions.ts"
         },
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "getPromptInteractionStateAction",
           "filename": "src/app/prompts/actions.ts"
         },
         "app/prompts/page": {
-          "moduleId": 1474,
+          "moduleId": 61814,
           "async": false,
           "exportedName": "getPromptInteractionStateAction",
           "filename": "src/app/prompts/actions.ts"
@@ -153,25 +633,25 @@
     "404290a3be575ffa11defbfb33579a5fd9a9f7858d": {
       "workers": {
         "app/categorias/[slug]/page": {
-          "moduleId": 14711,
+          "moduleId": 50456,
           "async": false,
           "exportedName": "togglePromptLikeAction",
           "filename": "src/app/prompts/actions.ts"
         },
         "app/page": {
-          "moduleId": 93339,
+          "moduleId": 8685,
           "async": false,
           "exportedName": "togglePromptLikeAction",
           "filename": "src/app/prompts/actions.ts"
         },
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "togglePromptLikeAction",
           "filename": "src/app/prompts/actions.ts"
         },
         "app/prompts/page": {
-          "moduleId": 1474,
+          "moduleId": 61814,
           "async": false,
           "exportedName": "togglePromptLikeAction",
           "filename": "src/app/prompts/actions.ts"
@@ -183,7 +663,7 @@
     "609073884814e9c02bf0d932cb07b52433321e423b": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "createLibraryFolderAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -195,7 +675,7 @@
     "00212201e0b1dd06ccd97b64fc0c206851a8722b34": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "getLibraryStateAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -207,7 +687,7 @@
     "601a3368c6862296c0b4c80c38718d70cd3e52980b": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "moveFavoriteToFolderAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -219,7 +699,7 @@
     "40c6c00097c1eac6337cbd139981b112342a506884": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "removeLibraryFavoriteAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -231,7 +711,7 @@
     "40c1147da1b26506fc787a27e4302d8a440ac663c8": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "removeLibraryLikeAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -243,7 +723,7 @@
     "6022c86d2e23707910f147a4fe76557bff163de07d": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "savePrivateNoteAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -255,7 +735,7 @@
     "7001fc2ffcc302dad747a866e648e71b3b87a4e11f": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "savePrivatePromptVersionAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -267,7 +747,7 @@
     "60e0be61230b4fe1790a24cba83bf7b0f1ad00b0a6": {
       "workers": {
         "app/biblioteca/page": {
-          "moduleId": 63709,
+          "moduleId": 84322,
           "async": false,
           "exportedName": "updateLibraryFolderColorAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -279,7 +759,7 @@
     "403712476cab0a5aae9964f25dd760fed192560a79": {
       "workers": {
         "app/confirmar-cuenta/page": {
-          "moduleId": 28832,
+          "moduleId": 18083,
           "async": false,
           "exportedName": "verifySignupOtpAction",
           "filename": "src/app/auth/actions.ts"
@@ -291,7 +771,7 @@
     "00ff68168a01667a73a679a339d421483270b2cf70": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "canDevelopAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -300,10 +780,22 @@
       "filename": "src/app/desarrollador/actions.ts",
       "exportedName": "canDevelopAction"
     },
+    "00b93c01d75d41deca42ef68d747ed8495867cc844": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "getDeveloperSettingsAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "getDeveloperSettingsAction"
+    },
     "40f5f7cc97cab23f4652fe987134eabc45bb1298cc": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "listDeveloperUsersAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -315,7 +807,7 @@
     "60ae4d9b600d0e0c8356b13b76913c792e37e94b35": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "penalizeUserAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -327,7 +819,7 @@
     "60196f3162d4fb3c599951855cb280f11f39f03309": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "setUserAccountStatusAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -336,10 +828,22 @@
       "filename": "src/app/desarrollador/actions.ts",
       "exportedName": "setUserAccountStatusAction"
     },
+    "403da1ab1a1cb42ac5bc59b82d900b9794ff83de3a": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "updateHomeMetricVisibilityAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "updateHomeMetricVisibilityAction"
+    },
     "001b0e6a0d6ae8279ffad130f5dc0767c8249578f6": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "getAboutContentAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -351,7 +855,7 @@
     "4093afdda79020f64be75982014125e7b757ac05c7": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "saveAboutContentAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -363,13 +867,13 @@
     "404fb620eeb560d6c27f78d96a38ca5a17493c9e66": {
       "workers": {
         "app/login/page": {
-          "moduleId": 41844,
+          "moduleId": 29617,
           "async": false,
           "exportedName": "loginAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/registro/page": {
-          "moduleId": 91232,
+          "moduleId": 76470,
           "async": false,
           "exportedName": "loginAction",
           "filename": "src/app/auth/actions.ts"
@@ -381,13 +885,13 @@
     "40a0ba5f6dda26abcbeb53217eb59993f40234eece": {
       "workers": {
         "app/login/page": {
-          "moduleId": 41844,
+          "moduleId": 29617,
           "async": false,
           "exportedName": "registerAction",
           "filename": "src/app/auth/actions.ts"
         },
         "app/registro/page": {
-          "moduleId": 91232,
+          "moduleId": 76470,
           "async": false,
           "exportedName": "registerAction",
           "filename": "src/app/auth/actions.ts"
@@ -399,7 +903,7 @@
     "704ac73d586aac1e60b291b0ddf78f1c62f51e8222": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "addTaxonomyItemAction",
           "filename": "src/app/moderacion/taxonomy-actions.ts"
@@ -411,7 +915,7 @@
     "60aa0480c3bac1d24d3fabd0fb5e23a927745328a4": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "deactivateTaxonomyItemAction",
           "filename": "src/app/moderacion/taxonomy-actions.ts"
@@ -423,7 +927,7 @@
     "002f846f7d2baf51b095c8ecf62857ee304887caf5": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "canModerateAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -435,7 +939,25 @@
     "40041677d0cd20d2e5449974e84eba98e53d6ae001": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "deletePromptAction",
+          "filename": "src/app/moderacion/actions.ts"
+        },
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 72982,
+          "async": false,
+          "exportedName": "deletePromptAction",
+          "filename": "src/app/moderacion/actions.ts"
+        },
+        "app/prompts/[slug]/editar/page": {
+          "moduleId": 63775,
+          "async": false,
+          "exportedName": "deletePromptAction",
+          "filename": "src/app/moderacion/actions.ts"
+        },
+        "app/prompts/[slug]/page": {
+          "moduleId": 26043,
           "async": false,
           "exportedName": "deletePromptAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -447,7 +969,25 @@
     "600b12dea79615e4a9254623c2ab250f7917f1e1a4": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "moderatePromptStatusAction",
+          "filename": "src/app/moderacion/actions.ts"
+        },
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 72982,
+          "async": false,
+          "exportedName": "moderatePromptStatusAction",
+          "filename": "src/app/moderacion/actions.ts"
+        },
+        "app/prompts/[slug]/editar/page": {
+          "moduleId": 63775,
+          "async": false,
+          "exportedName": "moderatePromptStatusAction",
+          "filename": "src/app/moderacion/actions.ts"
+        },
+        "app/prompts/[slug]/page": {
+          "moduleId": 26043,
           "async": false,
           "exportedName": "moderatePromptStatusAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -459,7 +999,7 @@
     "4001b2900b0561b6a96c8493d5005410fe96bd4edc": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "resolveReportAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -471,7 +1011,7 @@
     "4017417ee1c645b4a26ceb5fb11ea7beabcb463a5c": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "togglePromptExperimentalAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -483,7 +1023,7 @@
     "4090d4a8c5f5e38a42139efda864134cdf478b3c34": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "togglePromptValidatedAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -495,7 +1035,7 @@
     "00211c9131a9d24963155538726b8b5ae796c905ba": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "listOpenReportsAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -507,19 +1047,19 @@
     "4061dc5da1fda46c09344b591266ddaa70a87ba047": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "saveModeratedPromptAction",
           "filename": "src/app/moderacion/actions.ts"
         },
         "app/moderacion/prompts/[slug]/page": {
-          "moduleId": 14259,
+          "moduleId": 72982,
           "async": false,
           "exportedName": "saveModeratedPromptAction",
           "filename": "src/app/moderacion/actions.ts"
         },
         "app/prompts/[slug]/editar/page": {
-          "moduleId": 68936,
+          "moduleId": 63775,
           "async": false,
           "exportedName": "saveModeratedPromptAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -531,7 +1071,7 @@
     "005caa01a0605c8f8ba82c47e8c9de0b1980ae6954": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "listTaxonomyAction",
           "filename": "src/app/moderacion/taxonomy-actions.ts"
@@ -543,7 +1083,7 @@
     "002fa4f94d711bd76db9ea3fd8fe99d70c4fbc0cef": {
       "workers": {
         "app/perfil/page": {
-          "moduleId": 89711,
+          "moduleId": 72216,
           "async": false,
           "exportedName": "deleteAccountAction",
           "filename": "src/app/auth/actions.ts"
@@ -555,7 +1095,7 @@
     "00603f8441ced18bc1cddc1868a15b2c1b6cf0280d": {
       "workers": {
         "app/perfil/page": {
-          "moduleId": 89711,
+          "moduleId": 72216,
           "async": false,
           "exportedName": "logoutAction",
           "filename": "src/app/auth/actions.ts"
@@ -567,7 +1107,7 @@
     "40dcf2f7730ab9a2112ae6ecbca85000e091a4fd0a": {
       "workers": {
         "app/perfil/page": {
-          "moduleId": 89711,
+          "moduleId": 72216,
           "async": false,
           "exportedName": "updateProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -576,10 +1116,22 @@
       "filename": "src/app/auth/actions.ts",
       "exportedName": "updateProfileAction"
     },
+    "000794e48274312bdbccd9987c7cc3188c381782a7": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 72216,
+          "async": false,
+          "exportedName": "listMyPromptContributionsAction",
+          "filename": "src/app/perfil/actions.ts"
+        }
+      },
+      "filename": "src/app/perfil/actions.ts",
+      "exportedName": "listMyPromptContributionsAction"
+    },
     "40bba502030833bfe0e4e0aac347f4f1924e3ce4c1": {
       "workers": {
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "registerPromptCopyAction",
           "filename": "src/app/prompts/actions.ts"
@@ -591,7 +1143,7 @@
     "40dbeedd025bcfd5f30338482c1f54b3907b75d676": {
       "workers": {
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "registerTemplateUseAction",
           "filename": "src/app/prompts/actions.ts"
@@ -603,7 +1155,7 @@
     "704448dcdb90e3e5672931d525f56ff33555c4a5c2": {
       "workers": {
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "reportPromptAction",
           "filename": "src/app/prompts/actions.ts"
@@ -615,7 +1167,7 @@
     "4019623c6485537adacb95a28ae00aa5f5bd21b953": {
       "workers": {
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "togglePromptFavoriteAction",
           "filename": "src/app/prompts/actions.ts"
@@ -627,7 +1179,7 @@
     "60a80f439be6426e23e0659c3ed31e439ecc60cb23": {
       "workers": {
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "updatePromptStatsAction",
           "filename": "src/app/prompts/actions.ts"
@@ -639,7 +1191,7 @@
     "7881e335693995eb8ee03993f8f2a0a2e59e61f5dd": {
       "workers": {
         "app/prompts/[slug]/page": {
-          "moduleId": 94189,
+          "moduleId": 26043,
           "async": false,
           "exportedName": "saveTemplateVersionAction",
           "filename": "src/app/biblioteca/actions.ts"
@@ -651,7 +1203,7 @@
     "401bfd1152b778668bf26ce351b827e046cd2d922b": {
       "workers": {
         "app/subir/page": {
-          "moduleId": 69127,
+          "moduleId": 89646,
           "async": false,
           "exportedName": "submitPromptAction",
           "filename": "src/app/subir/actions.ts"

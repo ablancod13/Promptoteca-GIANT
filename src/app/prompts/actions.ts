@@ -18,9 +18,7 @@ export interface PromptInteractionState {
   stats: PromptStatsSnapshot;
 }
 
-type InteractionResult =
-  | { ok: true; message: string; state: PromptInteractionState }
-  | { ok: false; message: string };
+type InteractionResult = { ok: true; message: string; state: PromptInteractionState } | { ok: false; message: string };
 
 export async function getPromptInteractionStateAction(promptId: string): Promise<PromptInteractionState> {
   const admin = createSupabaseAdminClient();
@@ -80,10 +78,7 @@ export async function registerTemplateUseAction(promptId: string): Promise<Inter
   if (!context.ok) return context;
 
   const { admin, userId, prompt } = context;
-  await admin
-    .from("prompts")
-    .update({ template_uses_count: Number(prompt.template_uses_count ?? 0) + 1 })
-    .eq("id", promptId);
+  await admin.from("prompts").update({ template_uses_count: Number(prompt.template_uses_count ?? 0) + 1 }).eq("id", promptId);
   await admin.from("analytics_events").insert({
     user_id: userId,
     event_type: "uso_plantilla",
@@ -103,14 +98,14 @@ export async function registerTemplateUseAction(promptId: string): Promise<Inter
 export async function updatePromptStatsAction(promptId: string, stats: PromptStatsSnapshot): Promise<InteractionResult> {
   const supabase = await createSupabaseServerClient();
   const admin = createSupabaseAdminClient();
-  if (!supabase || !admin) return { ok: false, message: "Supabase no esta configurado." };
+  if (!supabase || !admin) return { ok: false, message: "Supabase no está configurado." };
 
   const { data: authData } = await supabase.auth.getUser();
-  if (!authData.user) return { ok: false, message: "Inicia sesion para editar estadisticas." };
+  if (!authData.user) return { ok: false, message: "Inicia sesión para editar estadísticas." };
 
   const { data: profile } = await admin.from("profiles").select("platform_role").eq("id", authData.user.id).single();
   if (!["admin", "developer"].includes(String(profile?.platform_role ?? ""))) {
-    return { ok: false, message: "No tienes permisos para editar estadisticas." };
+    return { ok: false, message: "No tienes permisos para editar estadísticas." };
   }
 
   const { data: prompt } = await admin.from("prompts").select("slug").eq("id", promptId).single();
@@ -127,7 +122,7 @@ export async function updatePromptStatsAction(promptId: string, stats: PromptSta
   revalidatePromptPaths(String(prompt?.slug ?? ""));
   return {
     ok: true,
-    message: "Estadisticas actualizadas.",
+    message: "Estadísticas actualizadas.",
     state: await getPromptInteractionStateAction(promptId)
   };
 }
@@ -135,7 +130,7 @@ export async function updatePromptStatsAction(promptId: string, stats: PromptSta
 export async function reportPromptAction(promptId: string, reason = "revisión solicitada", details = ""): Promise<{ ok: boolean; message: string }> {
   const admin = createSupabaseAdminClient();
   const supabase = await createSupabaseServerClient();
-  if (!admin) return { ok: false, message: "Supabase no esta configurado." };
+  if (!admin) return { ok: false, message: "Supabase no está configurado." };
 
   const { data: authData } = (await supabase?.auth.getUser()) ?? { data: { user: null } };
   const { data: prompt } = await admin.from("prompts").select("id,review_status").eq("id", promptId).single();
@@ -147,7 +142,7 @@ export async function reportPromptAction(promptId: string, reason = "revisión s
     prompt_id: promptId,
     reporter_id: authData.user?.id ?? null,
     reason,
-    details: details || null,
+    details: details.trim() || null,
     status: "open"
   });
 
@@ -157,11 +152,11 @@ export async function reportPromptAction(promptId: string, reason = "revisión s
     user_id: authData.user?.id ?? null,
     event_type: "prompt_reported",
     prompt_id: promptId,
-    metadata: { reason }
+    metadata: { reason, hasDetails: Boolean(details.trim()) }
   });
 
   revalidatePath("/moderacion");
-  return { ok: true, message: "Reporte enviado a moderacion." };
+  return { ok: true, message: "Reporte enviado a moderación." };
 }
 
 async function togglePromptRelation(promptId: string, table: "likes" | "favorites"): Promise<InteractionResult> {
@@ -178,11 +173,12 @@ async function togglePromptRelation(promptId: string, table: "likes" | "favorite
     await admin.from(table).insert({ user_id: userId, prompt_id: promptId });
   }
 
-  const count = await countRows(admin, table, promptId);
-  await admin
-    .from("prompts")
-    .update(table === "likes" ? { likes_count: count } : { favorites_count: count })
-    .eq("id", promptId);
+  const previousCount = Number(table === "likes" ? prompt.likes_count ?? 0 : prompt.favorites_count ?? 0);
+  const relationCount = await countRows(admin, table, promptId);
+  const optimisticCount = wasPresent ? Math.max(0, previousCount - 1) : previousCount + 1;
+  const count = Math.max(relationCount, optimisticCount);
+
+  await admin.from("prompts").update(table === "likes" ? { likes_count: count } : { favorites_count: count }).eq("id", promptId);
 
   await admin.from("analytics_events").insert({
     user_id: userId,
@@ -200,6 +196,10 @@ async function togglePromptRelation(promptId: string, table: "likes" | "favorite
       promptId,
       `${table}:${userId}:${promptId}`
     );
+
+    if (table === "likes" && prompt.author_id && String(prompt.author_id) !== userId) {
+      await upsertDailyLikeNotification(admin, String(prompt.author_id), String(prompt.title ?? "tu prompt"), promptId);
+    }
   }
 
   revalidatePromptPaths(prompt.slug);
@@ -213,18 +213,18 @@ async function togglePromptRelation(promptId: string, table: "likes" | "favorite
 async function getActionContext(promptId: string) {
   const supabase = await createSupabaseServerClient();
   const admin = createSupabaseAdminClient();
-  if (!supabase || !admin) return { ok: false as const, message: "Supabase no esta configurado." };
+  if (!supabase || !admin) return { ok: false as const, message: "Supabase no está configurado." };
 
   const { data: authData } = await supabase.auth.getUser();
-  if (!authData.user) return { ok: false as const, message: "Inicia sesion para usar esta funcion." };
+  if (!authData.user) return { ok: false as const, message: "Inicia sesión para usar esta función." };
 
   const { data: prompt } = await admin
     .from("prompts")
-    .select("id,slug,likes_count,favorites_count,copies_count,template_uses_count")
+    .select("id,slug,title,author_id,likes_count,favorites_count,copies_count,template_uses_count")
     .eq("id", promptId)
     .single();
 
-  if (!prompt) return { ok: false as const, message: "No se encontro el prompt." };
+  if (!prompt) return { ok: false as const, message: "No se encontró el prompt." };
 
   return { ok: true as const, admin, userId: authData.user.id, prompt };
 }
@@ -249,6 +249,52 @@ async function getPromptStats(admin: NonNullable<ReturnType<typeof createSupabas
 async function countRows(admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>, table: "likes" | "favorites", promptId: string) {
   const { count } = await admin.from(table).select("id", { count: "exact", head: true }).eq("prompt_id", promptId);
   return count ?? 0;
+}
+
+async function upsertDailyLikeNotification(
+  admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
+  authorId: string,
+  promptTitle: string,
+  promptId: string
+) {
+  const day = new Date().toISOString().slice(0, 10);
+  const { data: existing } = await admin
+    .from("notifications")
+    .select("id,metadata")
+    .eq("user_id", authorId)
+    .eq("type", "daily_likes")
+    .gte("created_at", `${day}T00:00:00.000Z`)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const metadata = (existing?.metadata as { count?: number; promptIds?: string[] } | null) ?? {};
+  const count = Number(metadata.count ?? 0) + 1;
+  const promptIds = [...new Set([...(metadata.promptIds ?? []), promptId])];
+  const title = count === 1 ? "Nuevo me gusta en tus prompts" : `${count} nuevos me gusta en tus prompts`;
+  const body = count === 1 ? `Tu prompt "${promptTitle}" recibió un me gusta.` : `Tus prompts recibieron ${count} me gusta hoy.`;
+
+  if (existing?.id) {
+    await admin
+      .from("notifications")
+      .update({
+        title,
+        body,
+        read_at: null,
+        metadata: { count, promptIds, date: day },
+        created_at: new Date().toISOString()
+      })
+      .eq("id", existing.id);
+    return;
+  }
+
+  await admin.from("notifications").insert({
+    user_id: authorId,
+    type: "daily_likes",
+    title,
+    body,
+    metadata: { count, promptIds, date: day }
+  });
 }
 
 async function awardPointsOnce(
@@ -294,5 +340,6 @@ function clamp(value: number) {
 function revalidatePromptPaths(slug: string) {
   revalidatePath("/");
   revalidatePath("/prompts");
+  revalidatePath("/perfil");
   if (slug) revalidatePath(`/prompts/${slug}`);
 }

@@ -18,6 +18,7 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
     templateUses: prompt.templateUses
   });
   const [status, setStatus] = useState("");
+  const [pulseKey, setPulseKey] = useState(0);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -49,12 +50,20 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
       return;
     }
 
+    const nextLiked = !liked;
+    setLiked(nextLiked);
+    setPulseKey((current) => current + 1);
+    setStats((current) => ({ ...current, likes: Math.max(0, current.likes + (nextLiked ? 1 : -1)) }));
+
     startTransition(async () => {
       const result = await togglePromptLikeAction(prompt.id);
       setStatus(result.message);
       if (result.ok) {
         setLiked(result.state.liked);
         setStats(result.state.stats);
+      } else {
+        setLiked(liked);
+        setStats((current) => ({ ...current, likes: Math.max(0, current.likes + (nextLiked ? -1 : 1)) }));
       }
     });
   }
@@ -119,11 +128,11 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
       <div className="stack">
         <div className="meta-row muted">
           <button
-            className={`heart-button ${liked ? "liked" : ""}`}
+            className={`heart-button ${liked ? "liked" : ""} ${pulseKey ? "heart-pulse" : ""}`}
             type="button"
             title={liked ? "Quitar me gusta" : "Me gusta"}
             onClick={toggleLike}
-            disabled={isPending}
+            aria-pressed={liked}
           >
             <Heart size={17} fill={liked ? "currentColor" : "none"} /> {stats.likes}
           </button>

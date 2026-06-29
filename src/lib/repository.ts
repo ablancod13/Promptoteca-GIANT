@@ -1,5 +1,5 @@
 import { AI_MODELS, INITIAL_CATEGORIES, MODELS_BY_TOOL, RECOMMENDED_TOOLS } from "@/lib/constants";
-import { applyPromptFilters, detectVariables } from "@/lib/prompt-utils";
+import { applyPromptFilters, detectVariables, normalizeSearchText } from "@/lib/prompt-utils";
 import { seedPrompts } from "@/lib/seed-data";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Difficulty, Prompt, PromptFilters, PromptTool, PromptVariable, ReviewStatus, VariableFieldType } from "@/lib/types";
@@ -12,13 +12,14 @@ export interface SubmissionModelOption {
 }
 
 export async function listPrompts(filters?: PromptFilters): Promise<Prompt[]> {
-  const prompts = mergePrompts(await listSupabasePrompts(), seedPrompts);
+  const remotePrompts = await listSupabasePrompts();
+  const prompts = remotePrompts ?? seedPrompts;
   return applyPromptFilters(prompts, filters);
 }
 
 export async function getPromptBySlug(slug: string): Promise<Prompt | null> {
-  const remote = (await listSupabasePrompts()).find((prompt) => prompt.slug === slug);
-  if (remote) return remote;
+  const remotePrompts = await listSupabasePrompts();
+  if (remotePrompts) return remotePrompts.find((prompt) => prompt.slug === slug) ?? null;
   return seedPrompts.find((prompt) => prompt.slug === slug) ?? null;
 }
 
@@ -81,7 +82,11 @@ export async function getCategorySummary(): Promise<Array<{ name: string; count:
 }
 
 export async function getHomeStats() {
-  const prompts = await listPrompts();
+  const [prompts, platformMetrics, homeSettings] = await Promise.all([
+    listPrompts(),
+    getPlatformMetrics(),
+    getHomeMetricSettings()
+  ]);
   const monthKey = new Date().toISOString().slice(0, 7);
   const categoryCounts = new Map<string, number>();
 
@@ -93,11 +98,13 @@ export async function getHomeStats() {
 
   return {
     totalPrompts: prompts.length,
+    registeredUsers: platformMetrics.registeredUsers,
+    showRegisteredUsersMetric: homeSettings.showRegisteredUsers,
     publishedThisMonth: prompts.filter((prompt) => prompt.publishedAt.startsWith(monthKey)).length,
     pendingReview: prompts.filter((prompt) => prompt.reviewStatus === "pending").length,
     validatedByGiant: prompts.filter((prompt) => prompt.validatedByGiant).length,
     totalCopies: prompts.reduce((sum, prompt) => sum + prompt.copies, 0),
-    totalFavorites: prompts.reduce((sum, prompt) => sum + prompt.favorites, 0),
+    totalFavorites: platformMetrics.favoritesCount ?? prompts.reduce((sum, prompt) => sum + prompt.favorites, 0),
     customVersions: prompts.reduce((sum, prompt) => sum + prompt.templateUses, 0),
     topCategory: Array.from(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Lectura critica",
     mostSaved: [...prompts].sort((a, b) => b.favorites - a.favorites)[0] ?? fallback,
@@ -113,20 +120,21 @@ export async function getRankings() {
     monthly: [...prompts].sort((a, b) => b.copies + b.favorites - (a.copies + a.favorites)).slice(0, 5),
     validated: prompts.filter((prompt) => prompt.validatedByGiant).slice(0, 5),
     microbiology: prompts
-      .filter((prompt) => prompt.category === "Microbiologia clinica" || prompt.secondaryCategories.includes("Microbiologia clinica"))
+      .filter((prompt) => categoryMatches(prompt, "Microbiologia clinica"))
       .sort((a, b) => b.likes - a.likes),
     infectiousDiseases: prompts
-      .filter((prompt) => prompt.category === "Enfermedades infecciosas" || prompt.secondaryCategories.includes("Enfermedades infecciosas"))
+      .filter((prompt) => categoryMatches(prompt, "Enfermedades infecciosas"))
       .sort((a, b) => b.likes - a.likes)
   };
 }
 
-async function listSupabasePrompts(): Promise<Prompt[]> {
+async function listSupabasePrompts(): Promise<Prompt[] | null> {
   const supabase = createSupabaseAdminClient();
-  if (!supabase) return [];
+  if (!supabase) return null;
 
   const { data: promptRows, error } = await supabase.from("prompts").select("*").order("created_at", { ascending: false });
-  if (error || !promptRows?.length) return [];
+  if (error) return [];
+  if (!promptRows?.length) return [];
 
   const promptIds = promptRows.map((row) => row.id as string);
   const authorIds = promptRows.map((row) => row.author_id).filter(Boolean) as string[];
@@ -255,19 +263,33 @@ function groupBy(rows: Row[], field: string) {
   return grouped;
 }
 
-function mergePrompts(remotePrompts: Prompt[], fallbackPrompts: Prompt[]) {
-  if (remotePrompts.length) return remotePrompts;
-
-  const bySlug = new Map(remotePrompts.map((prompt) => [prompt.slug, prompt]));
-  for (const prompt of fallbackPrompts) {
-    if (!bySlug.has(prompt.slug)) bySlug.set(prompt.slug, prompt);
-  }
-  return Array.from(bySlug.values());
-}
-
 function valuesOrFallback<T extends readonly string[] | string[]>(rows: Array<{ name: string }> | null, fallback: T): string[] {
   const values = rows?.map((row) => String(row.name)).filter(Boolean) ?? [];
   return (values.length ? values : [...fallback]).sort((a, b) => a.localeCompare(b, "es"));
+}
+
+async function getPlatformMetrics() {
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return { registeredUsers: 0, favoritesCount: null as number | null };
+
+  const [profiles, favorites] = await Promise.all([
+    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("favorites").select("id", { count: "exact", head: true })
+  ]);
+
+  return {
+    registeredUsers: profiles.count ?? 0,
+    favoritesCount: favorites.count ?? null
+  };
+}
+
+export async function getHomeMetricSettings() {
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return { showRegisteredUsers: true };
+
+  const { data } = await supabase.from("app_settings").select("value").eq("key", "home_metrics").maybeSingle();
+  const value = data?.value as { showRegisteredUsers?: boolean } | null;
+  return { showRegisteredUsers: value?.showRegisteredUsers !== false };
 }
 
 function modelOptionsOrFallback(rows: Array<{ name: string; tool_name?: string | null }> | null): SubmissionModelOption[] {
@@ -287,4 +309,9 @@ function fallbackModelOptions(): SubmissionModelOption[] {
     const toolName = (Object.keys(MODELS_BY_TOOL) as PromptTool[]).find((tool) => MODELS_BY_TOOL[tool].includes(name));
     return { name, toolName };
   });
+}
+
+function categoryMatches(prompt: Prompt, expected: string) {
+  const normalized = normalizeSearchText(expected);
+  return [prompt.category, ...prompt.secondaryCategories].some((category) => normalizeSearchText(category) === normalized);
 }

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { Clipboard, Flag, Heart, Lock, PenLine, Star } from "lucide-react";
+import { Archive, Clipboard, Edit3, Flag, Heart, Lock, PenLine, Star, Trash2 } from "lucide-react";
+import { deletePromptAction, moderatePromptStatusAction } from "@/app/moderacion/actions";
 import {
   getPromptInteractionStateAction,
   registerPromptCopyAction,
@@ -15,11 +17,12 @@ import {
 } from "@/app/prompts/actions";
 import { buildCcByCitation, getLicenseUrl } from "@/lib/license";
 import { trackAnalyticsEvent } from "@/lib/analytics";
-import { canDevelop, getLocalUser } from "@/lib/local-user";
+import { canDevelop, canModerate, getLocalUser } from "@/lib/local-user";
 import type { Prompt } from "@/lib/types";
 import { TemplateWizard } from "@/components/TemplateWizard";
 
 export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
+  const router = useRouter();
   const [isRegistered, setIsRegistered] = useState(false);
   const [isGated, setIsGated] = useState(false);
   const [message, setMessage] = useState("");
@@ -27,6 +30,10 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
   const [liked, setLiked] = useState(false);
   const [favorited, setFavorited] = useState(false);
   const [developerMode, setDeveloperMode] = useState(false);
+  const [canManage, setCanManage] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportDetails, setReportDetails] = useState("");
+  const [heartPulse, setHeartPulse] = useState(0);
   const [isPending, startTransition] = useTransition();
   const [stats, setStats] = useState<PromptStatsSnapshot>({
     likes: prompt.likes,
@@ -41,6 +48,7 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
     const registered = Boolean(user);
     setIsRegistered(registered);
     setDeveloperMode(canDevelop(user));
+    setCanManage(canModerate(user) || canDevelop(user));
     setStats({
       likes: prompt.likes,
       favorites: prompt.favorites,
@@ -93,12 +101,19 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
       return;
     }
 
+    const nextFavorited = !favorited;
+    setFavorited(nextFavorited);
+    setStats((current) => ({ ...current, favorites: Math.max(0, current.favorites + (nextFavorited ? 1 : -1)) }));
+
     startTransition(async () => {
       const result = await togglePromptFavoriteAction(prompt.id);
       setMessage(result.message);
       if (result.ok) {
         setFavorited(result.state.favorited);
         setStats(result.state.stats);
+      } else {
+        setFavorited(favorited);
+        setStats((current) => ({ ...current, favorites: Math.max(0, current.favorites + (nextFavorited ? -1 : 1)) }));
       }
     });
     void trackAnalyticsEvent({ type: "favorito", promptId: prompt.id });
@@ -110,12 +125,20 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
       return;
     }
 
+    const nextLiked = !liked;
+    setLiked(nextLiked);
+    setHeartPulse((current) => current + 1);
+    setStats((current) => ({ ...current, likes: Math.max(0, current.likes + (nextLiked ? 1 : -1)) }));
+
     startTransition(async () => {
       const result = await togglePromptLikeAction(prompt.id);
       setMessage(result.message);
       if (result.ok) {
         setLiked(result.state.liked);
         setStats(result.state.stats);
+      } else {
+        setLiked(liked);
+        setStats((current) => ({ ...current, likes: Math.max(0, current.likes + (nextLiked ? -1 : 1)) }));
       }
     });
     void trackAnalyticsEvent({ type: "like", promptId: prompt.id });
@@ -137,8 +160,29 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
 
   function reportPrompt() {
     startTransition(async () => {
-      const result = await reportPromptAction(prompt.id);
+      const result = await reportPromptAction(prompt.id, "revisión solicitada", reportDetails);
       setMessage(result.message);
+      if (result.ok) {
+        setReportDetails("");
+        setReportOpen(false);
+      }
+    });
+  }
+
+  function archivePrompt() {
+    startTransition(async () => {
+      const result = await moderatePromptStatusAction(prompt.id, "archived");
+      setMessage(result.message);
+      if (result.ok) router.push("/prompts");
+    });
+  }
+
+  function deletePrompt() {
+    if (!window.confirm("¿Eliminar este prompt definitivamente?")) return;
+    startTransition(async () => {
+      const result = await deletePromptAction(prompt.id);
+      setMessage(result.message);
+      if (result.ok) router.push("/prompts");
     });
   }
 
@@ -222,13 +266,29 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
           <button className="button secondary" type="button" onClick={saveFavorite} disabled={isPending}>
             <Star size={16} fill={favorited ? "currentColor" : "none"} /> {favorited ? "Guardado" : "Guardar"}
           </button>
-          <button className={`heart-button ${liked ? "liked" : ""}`} type="button" onClick={likePrompt} disabled={isPending}>
+          <button className={`heart-button ${liked ? "liked" : ""} ${heartPulse ? "heart-pulse" : ""}`} type="button" onClick={likePrompt} aria-pressed={liked}>
             <Heart size={18} fill={liked ? "currentColor" : "none"} /> {liked ? "Te gusta" : "Me gusta"}
           </button>
-          <button className="button danger" type="button" onClick={reportPrompt}>
+          <button className="button danger" type="button" onClick={() => setReportOpen((current) => !current)}>
             <Flag size={16} /> Reportar
           </button>
         </div>
+        {reportOpen ? (
+          <div className="report-box">
+            <label className="field">
+              <span>Mensaje opcional para moderación</span>
+              <textarea
+                className="textarea compact-area"
+                value={reportDetails}
+                maxLength={600}
+                onChange={(event) => setReportDetails(event.target.value)}
+              />
+            </label>
+            <button className="button danger" type="button" onClick={reportPrompt} disabled={isPending}>
+              <Flag size={16} /> Enviar reporte
+            </button>
+          </div>
+        ) : null}
         {message ? <div className="callout">{message}</div> : null}
         {showTemplate ? <TemplateWizard prompt={prompt} /> : null}
       </section>
@@ -278,6 +338,20 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
         <div className="callout">
           <small>{buildCcByCitation(prompt)}</small>
         </div>
+        {canManage ? (
+          <div className="moderation-actions stack">
+            <strong>Moderación</strong>
+            <Link className="button secondary" href={`/moderacion/prompts/${prompt.slug}`}>
+              <Edit3 size={16} /> Editar
+            </Link>
+            <button className="button secondary" type="button" onClick={archivePrompt} disabled={isPending}>
+              <Archive size={16} /> Archivar
+            </button>
+            <button className="button danger" type="button" onClick={deletePrompt} disabled={isPending}>
+              <Trash2 size={16} /> Eliminar
+            </button>
+          </div>
+        ) : null}
       </aside>
     </div>
   );

@@ -5,9 +5,11 @@ import Link from "next/link";
 import { MinusCircle, Search, ShieldAlert } from "lucide-react";
 import {
   canDevelopAction,
+  getDeveloperSettingsAction,
   listDeveloperUsersAction,
   penalizeUserAction,
   setUserAccountStatusAction,
+  updateHomeMetricVisibilityAction,
   type DeveloperUser
 } from "@/app/desarrollador/actions";
 import { DeveloperAboutEditor } from "@/components/DeveloperAboutEditor";
@@ -16,13 +18,17 @@ export function DeveloperPanel() {
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<DeveloperUser[]>([]);
+  const [showRegisteredUsers, setShowRegisteredUsers] = useState(true);
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     canDevelopAction().then((canDevelop) => {
       setAllowed(canDevelop);
-      if (canDevelop) void refreshUsers("");
+      if (canDevelop) {
+        void refreshUsers("");
+        getDeveloperSettingsAction().then((settings) => setShowRegisteredUsers(settings.showRegisteredUsers));
+      }
     });
   }, []);
 
@@ -64,6 +70,15 @@ export function DeveloperPanel() {
     });
   }
 
+  function saveHomeMetrics(checked: boolean) {
+    setShowRegisteredUsers(checked);
+    setMessage("");
+    startTransition(async () => {
+      const result = await updateHomeMetricVisibilityAction(checked);
+      setMessage(result.message);
+    });
+  }
+
   if (allowed === false) {
     return (
       <section className="form-panel stack">
@@ -87,6 +102,22 @@ export function DeveloperPanel() {
   return (
     <div className="stack">
       <DeveloperAboutEditor />
+
+      <section className="table-panel stack">
+        <div className="section-head compact">
+          <h2>Home</h2>
+          <span className="badge">Métricas públicas</span>
+        </div>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={showRegisteredUsers}
+            onChange={(event) => saveHomeMetrics(event.target.checked)}
+            disabled={isPending}
+          />{" "}
+          Mostrar usuarios registrados en la portada
+        </label>
+      </section>
 
       <section className="table-panel stack">
         <div className="section-head compact">

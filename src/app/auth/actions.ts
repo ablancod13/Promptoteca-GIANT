@@ -125,6 +125,10 @@ export async function loginAction(payload: LoginPayload): Promise<AuthResult> {
 
   const user = await getCurrentLocalUser();
   if (!user) return { ok: false, message: "Sesion iniciada, pero no se encontro el perfil." };
+  if (user.accountStatus === "blocked") {
+    await supabase.auth.signOut();
+    return { ok: false, message: "Tu cuenta ha sido bloqueada. Contacta con GIANT-SEIMC si crees que se trata de un error." };
+  }
 
   revalidatePath("/");
   return { ok: true, message: "Sesion iniciada.", user };
@@ -164,15 +168,17 @@ export async function getCurrentProfileAction(): Promise<LocalUser | null> {
 
 export async function updateProfileAction(payload: ProfileUpdatePayload): Promise<AuthResult> {
   const supabase = await createSupabaseServerClient();
+  const admin = createSupabaseAdminClient();
   if (!supabase) return { ok: false, message: "Supabase no esta configurado." };
 
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) return { ok: false, message: "Inicia sesion para actualizar tu perfil." };
 
+  const displayName = normalizeDisplayName(payload.displayName);
   const { data, error } = await supabase
     .from("profiles")
     .update({
-      display_name: normalizeDisplayName(payload.displayName),
+      display_name: displayName,
       country: payload.country,
       region: isSpainCountry(payload.country) ? payload.region : "",
       city: isSpainCountry(payload.country) ? null : payload.city,
@@ -186,7 +192,13 @@ export async function updateProfileAction(payload: ProfileUpdatePayload): Promis
 
   if (error) return { ok: false, message: translateProfileError(error.message) };
 
+  if (admin) {
+    await admin.from("prompts").update({ author_display_name: displayName }).eq("author_id", authData.user.id);
+  }
+
+  revalidatePath("/");
   revalidatePath("/perfil");
+  revalidatePath("/prompts");
   return { ok: true, message: "Configuracion guardada.", user: profileRowToLocalUser(data) };
 }
 
@@ -255,6 +267,7 @@ function buildProfileInsert(userId: string, payload: RegisterPayload, displayNam
 
 function profileRowToLocalUser(row: Record<string, any>): LocalUser {
   return {
+    id: String(row.id ?? ""),
     email: String(row.email ?? ""),
     name: String(row.first_name ?? "Usuario"),
     surname: String(row.last_name ?? ""),
@@ -278,7 +291,8 @@ function profileRowToLocalUser(row: Record<string, any>): LocalUser {
     aiFrequency: String(row.ai_frequency ?? ""),
     aiProfessionalUse: String(row.ai_professional_use ?? ""),
     aiLevel: String(row.ai_experience_level ?? ""),
-    aiTools: Array.isArray(row.ai_tools) ? row.ai_tools.map(String) : []
+    aiTools: Array.isArray(row.ai_tools) ? row.ai_tools.map(String) : [],
+    accountStatus: String(row.account_status ?? "active")
   };
 }
 

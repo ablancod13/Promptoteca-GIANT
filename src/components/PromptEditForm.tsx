@@ -2,12 +2,14 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { Save, ShieldCheck } from "lucide-react";
-import { saveModeratedPromptAction } from "@/app/moderacion/actions";
+import { useRouter } from "next/navigation";
+import { Archive, Save, ShieldCheck, Trash2 } from "lucide-react";
+import { deletePromptAction, moderatePromptStatusAction, saveModeratedPromptAction } from "@/app/moderacion/actions";
 import { canModerate, getLocalUser } from "@/lib/local-user";
 import type { Prompt } from "@/lib/types";
 
 export function PromptEditForm({ prompt, moderation = false }: { prompt: Prompt; moderation?: boolean }) {
+  const router = useRouter();
   const [message, setMessage] = useState("");
   const [canApproveDirectly, setCanApproveDirectly] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -36,6 +38,23 @@ export function PromptEditForm({ prompt, moderation = false }: { prompt: Prompt;
       });
 
       setMessage(result.message);
+    });
+  }
+
+  function archivePrompt() {
+    startTransition(async () => {
+      const result = await moderatePromptStatusAction(prompt.id, "archived");
+      setMessage(result.message);
+      if (result.ok) router.push("/moderacion");
+    });
+  }
+
+  function deletePrompt() {
+    if (!window.confirm("¿Eliminar este prompt definitivamente?")) return;
+    startTransition(async () => {
+      const result = await deletePromptAction(prompt.id);
+      setMessage(result.message);
+      if (result.ok) router.push("/moderacion");
     });
   }
 
@@ -77,6 +96,16 @@ export function PromptEditForm({ prompt, moderation = false }: { prompt: Prompt;
           <button className="button accent" type="submit" name="intent" value="approve" disabled={isPending}>
             <ShieldCheck size={17} /> Guardar y aprobar
           </button>
+        ) : null}
+        {canApproveDirectly || moderation ? (
+          <>
+            <button className="button secondary" type="button" onClick={archivePrompt} disabled={isPending}>
+              <Archive size={17} /> Archivar
+            </button>
+            <button className="button danger" type="button" onClick={deletePrompt} disabled={isPending}>
+              <Trash2 size={17} /> Eliminar
+            </button>
+          </>
         ) : null}
         <Link className="button secondary" href={`/prompts/${prompt.slug}`}>
           Ver prompt

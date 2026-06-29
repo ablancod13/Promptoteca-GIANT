@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/quienes-somos/page": {
-          "moduleId": 54599,
+          "moduleId": 95997,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -11,6 +11,54 @@
       },
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
+    },
+    "0090db71646b79d0249d4cbb3f7b2fd9aef4a08a31": {
+      "workers": {
+        "app/quienes-somos/page": {
+          "moduleId": 95997,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "deleteAllNotificationsAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "40f7cce949652620ccaf9972a4ad6077a95eae3354": {
+      "workers": {
+        "app/quienes-somos/page": {
+          "moduleId": 95997,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "deleteNotificationAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "00b208efefee590914f1b080643217344504eaa595": {
+      "workers": {
+        "app/quienes-somos/page": {
+          "moduleId": 95997,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "listNotificationsAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "000f0770c15afb6b5d07aa81349a10afe34cb8164c": {
+      "workers": {
+        "app/quienes-somos/page": {
+          "moduleId": 95997,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "markAllNotificationsReadAction",
+      "filename": "src/app/notificaciones/actions.ts"
     }
   },
   "edge": {}

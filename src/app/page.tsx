@@ -14,6 +14,14 @@ export default async function HomePage() {
     getAboutContent()
   ]);
 
+  const metrics: Array<{ label: string; value: string | number }> = [
+    ...(stats.showRegisteredUsersMetric ? [{ label: "Usuarios registrados", value: stats.registeredUsers }] : []),
+    { label: "Prompts publicados", value: stats.totalPrompts },
+    { label: "Validados GIANT", value: stats.validatedByGiant },
+    { label: "Usos registrados", value: stats.totalCopies },
+    { label: "Favoritos guardados", value: stats.totalFavorites }
+  ];
+
   return (
     <main className="page">
       <section className="hero">
@@ -44,15 +52,25 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="section join-giant-callout">
+        <div className="stack">
+          <span className="eyebrow">GIANT-SEIMC</span>
+          <h2>Únete a GIANT</h2>
+          <p>
+            Mantente al día de las actualizaciones más recientes y lo mejor de inteligencia artificial y nuevas tecnologías.
+            Es totalmente gratuito.
+          </p>
+        </div>
+        <a
+          className="button accent"
+          href="mailto:secretaria@seimc.org?subject=Solicitud%20de%20alta%20en%20GIANT&body=Hola%2C%20soy%20%5Bnombre%20y%20apellidos%5D%20quiero%20unirme%20a%20GIANT%20para%20estar%20siempre%20actualizado."
+        >
+          Unirme a GIANT
+        </a>
+      </section>
+
       <section className="section">
-        <MetricStrip
-          metrics={[
-            { label: "Prompts publicados", value: stats.totalPrompts },
-            { label: "Validados GIANT", value: stats.validatedByGiant },
-            { label: "Usos registrados", value: stats.totalCopies },
-            { label: "Favoritos guardados", value: stats.totalFavorites }
-          ]}
-        />
+        <MetricStrip metrics={metrics} />
       </section>
 
       <AboutContentClient content={aboutContent} variant="home" />

@@ -1,6 +1,7 @@
 import type { PlatformRole } from "@/lib/types";
 
 export interface LocalUser {
+  id?: string;
   email: string;
   name: string;
   surname?: string;
@@ -26,6 +27,7 @@ export interface LocalUser {
   aiProfessionalUse?: string;
   aiLevel?: string;
   aiTools?: string[];
+  accountStatus?: string;
 }
 
 export const LOCAL_USER_KEY = "giant_demo_user";
@@ -40,6 +42,7 @@ export function getLocalUser(): LocalUser | null {
     const parsed = JSON.parse(raw) as Partial<LocalUser>;
     return {
       email: parsed.email ?? "",
+      id: parsed.id,
       name: parsed.name || "Usuario GIANT",
       surname: parsed.surname ?? "",
       displayName: parsed.displayName || parsed.name || "Usuario GIANT",
@@ -63,7 +66,8 @@ export function getLocalUser(): LocalUser | null {
       aiFrequency: parsed.aiFrequency,
       aiProfessionalUse: parsed.aiProfessionalUse,
       aiLevel: parsed.aiLevel,
-      aiTools: parsed.aiTools
+      aiTools: parsed.aiTools,
+      accountStatus: parsed.accountStatus
     };
   } catch {
     return null;

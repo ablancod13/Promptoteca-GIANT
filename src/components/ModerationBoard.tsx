@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { CheckCircle2, EyeOff, FlaskConical, ShieldCheck, Trash2 } from "lucide-react";
+import { Archive, CheckCircle2, EyeOff, FlaskConical, ShieldCheck, Trash2 } from "lucide-react";
 import {
   deletePromptAction,
   moderatePromptStatusAction,
@@ -136,7 +136,7 @@ export function ModerationBoard({
                   <div className="badge-row">
                     {prompt.experimental ? <span className="badge amber">Experimental</span> : null}
                     {prompt.likes > 30 ? <span className="badge teal">Alta actividad</span> : null}
-                    {prompt.category === "Microbiologia clinica" || prompt.category === "PROA" ? <span className="badge blue">Revisar riesgo</span> : null}
+                    {["microbiologia clinica", "proa"].includes(normalizeLabel(prompt.category)) ? <span className="badge blue">Revisar riesgo</span> : null}
                   </div>
                 </td>
                 <td>
@@ -155,6 +155,9 @@ export function ModerationBoard({
                     </button>
                     <button className="icon-button" title="Ocultar" type="button" onClick={() => setStatus(prompt, "hidden")} disabled={isPending}>
                       <EyeOff size={18} />
+                    </button>
+                    <button className="icon-button" title="Archivar" type="button" onClick={() => setStatus(prompt, "archived")} disabled={isPending}>
+                      <Archive size={18} />
                     </button>
                     <button className="icon-button" title="Eliminar" type="button" onClick={() => deletePrompt(prompt)} disabled={isPending}>
                       <Trash2 size={18} />
@@ -178,4 +181,11 @@ export function ModerationBoard({
       </section>
     </div>
   );
+}
+
+function normalizeLabel(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 }

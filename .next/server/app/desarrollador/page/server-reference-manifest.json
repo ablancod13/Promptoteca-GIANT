@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -12,10 +12,58 @@
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
     },
+    "0090db71646b79d0249d4cbb3f7b2fd9aef4a08a31": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "deleteAllNotificationsAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "40f7cce949652620ccaf9972a4ad6077a95eae3354": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "deleteNotificationAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "00b208efefee590914f1b080643217344504eaa595": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "listNotificationsAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "000f0770c15afb6b5d07aa81349a10afe34cb8164c": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "markAllNotificationsReadAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
     "00ff68168a01667a73a679a339d421483270b2cf70": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "canDevelopAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -24,10 +72,22 @@
       "exportedName": "canDevelopAction",
       "filename": "src/app/desarrollador/actions.ts"
     },
+    "00b93c01d75d41deca42ef68d747ed8495867cc844": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "getDeveloperSettingsAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "exportedName": "getDeveloperSettingsAction",
+      "filename": "src/app/desarrollador/actions.ts"
+    },
     "40f5f7cc97cab23f4652fe987134eabc45bb1298cc": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "listDeveloperUsersAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -39,7 +99,7 @@
     "60ae4d9b600d0e0c8356b13b76913c792e37e94b35": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "penalizeUserAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -51,7 +111,7 @@
     "60196f3162d4fb3c599951855cb280f11f39f03309": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "setUserAccountStatusAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -60,10 +120,22 @@
       "exportedName": "setUserAccountStatusAction",
       "filename": "src/app/desarrollador/actions.ts"
     },
+    "403da1ab1a1cb42ac5bc59b82d900b9794ff83de3a": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "updateHomeMetricVisibilityAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "exportedName": "updateHomeMetricVisibilityAction",
+      "filename": "src/app/desarrollador/actions.ts"
+    },
     "001b0e6a0d6ae8279ffad130f5dc0767c8249578f6": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "getAboutContentAction",
           "filename": "src/app/desarrollador/actions.ts"
@@ -75,7 +147,7 @@
     "4093afdda79020f64be75982014125e7b757ac05c7": {
       "workers": {
         "app/desarrollador/page": {
-          "moduleId": 19714,
+          "moduleId": 58084,
           "async": false,
           "exportedName": "saveAboutContentAction",
           "filename": "src/app/desarrollador/actions.ts"

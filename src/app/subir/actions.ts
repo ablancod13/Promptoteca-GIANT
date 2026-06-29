@@ -245,6 +245,7 @@ async function getLocalUserFromProfile(admin: NonNullable<ReturnType<typeof crea
   if (!data) return null;
 
   return {
+    id: String(data.id ?? ""),
     email: String(data.email ?? ""),
     name: String(data.first_name ?? "Usuario"),
     surname: String(data.last_name ?? ""),
@@ -268,7 +269,8 @@ async function getLocalUserFromProfile(admin: NonNullable<ReturnType<typeof crea
     aiFrequency: String(data.ai_frequency ?? ""),
     aiProfessionalUse: String(data.ai_professional_use ?? ""),
     aiLevel: String(data.ai_experience_level ?? ""),
-    aiTools: Array.isArray(data.ai_tools) ? data.ai_tools.map(String) : []
+    aiTools: Array.isArray(data.ai_tools) ? data.ai_tools.map(String) : [],
+    accountStatus: String(data.account_status ?? "active")
   };
 }
 

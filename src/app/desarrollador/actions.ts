@@ -18,6 +18,10 @@ export interface DeveloperUser {
   createdAt: string;
 }
 
+export interface DeveloperSettings {
+  showRegisteredUsers: boolean;
+}
+
 type ActionResult = { ok: true; message: string } | { ok: false; message: string };
 
 export async function canDevelopAction(): Promise<boolean> {
@@ -53,6 +57,36 @@ export async function listDeveloperUsersAction(query = ""): Promise<DeveloperUse
       if (!normalizedQuery) return true;
       return `${user.displayName} ${user.email} ${user.professionalRole}`.toLocaleLowerCase("es").includes(normalizedQuery);
     });
+}
+
+export async function getDeveloperSettingsAction(): Promise<DeveloperSettings> {
+  const context = await getDeveloperContext();
+  if (!context.ok) return { showRegisteredUsers: true };
+
+  const { data } = await context.supabase.from("app_settings").select("value").eq("key", "home_metrics").maybeSingle();
+  const value = data?.value as { showRegisteredUsers?: boolean } | null;
+  return { showRegisteredUsers: value?.showRegisteredUsers !== false };
+}
+
+export async function updateHomeMetricVisibilityAction(showRegisteredUsers: boolean): Promise<ActionResult> {
+  const context = await getDeveloperContext();
+  if (!context.ok) return { ok: false, message: context.message };
+
+  const { error } = await context.supabase.from("app_settings").upsert(
+    {
+      key: "home_metrics",
+      value: { showRegisteredUsers },
+      updated_by: context.userId,
+      updated_at: new Date().toISOString()
+    },
+    { onConflict: "key" }
+  );
+
+  if (error) return { ok: false, message: "No se pudo guardar el ajuste." };
+
+  revalidatePath("/");
+  revalidatePath("/desarrollador");
+  return { ok: true, message: "Ajuste del home guardado." };
 }
 
 export async function setUserAccountStatusAction(userId: string, status: "active" | "blocked"): Promise<ActionResult> {

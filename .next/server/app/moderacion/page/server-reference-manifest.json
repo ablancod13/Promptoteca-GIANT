@@ -3,7 +3,7 @@
     "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
@@ -12,10 +12,58 @@
       "exportedName": "getCurrentProfileAction",
       "filename": "src/app/auth/actions.ts"
     },
+    "0090db71646b79d0249d4cbb3f7b2fd9aef4a08a31": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "deleteAllNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "deleteAllNotificationsAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "40f7cce949652620ccaf9972a4ad6077a95eae3354": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "deleteNotificationAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "deleteNotificationAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "00b208efefee590914f1b080643217344504eaa595": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "listNotificationsAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "listNotificationsAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
+    "000f0770c15afb6b5d07aa81349a10afe34cb8164c": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 53718,
+          "async": false,
+          "exportedName": "markAllNotificationsReadAction",
+          "filename": "src/app/notificaciones/actions.ts"
+        }
+      },
+      "exportedName": "markAllNotificationsReadAction",
+      "filename": "src/app/notificaciones/actions.ts"
+    },
     "704ac73d586aac1e60b291b0ddf78f1c62f51e8222": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "addTaxonomyItemAction",
           "filename": "src/app/moderacion/taxonomy-actions.ts"
@@ -27,7 +75,7 @@
     "60aa0480c3bac1d24d3fabd0fb5e23a927745328a4": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "deactivateTaxonomyItemAction",
           "filename": "src/app/moderacion/taxonomy-actions.ts"
@@ -39,7 +87,7 @@
     "002f846f7d2baf51b095c8ecf62857ee304887caf5": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "canModerateAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -51,7 +99,7 @@
     "40041677d0cd20d2e5449974e84eba98e53d6ae001": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "deletePromptAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -63,7 +111,7 @@
     "600b12dea79615e4a9254623c2ab250f7917f1e1a4": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "moderatePromptStatusAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -75,7 +123,7 @@
     "4001b2900b0561b6a96c8493d5005410fe96bd4edc": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "resolveReportAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -87,7 +135,7 @@
     "4017417ee1c645b4a26ceb5fb11ea7beabcb463a5c": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "togglePromptExperimentalAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -99,7 +147,7 @@
     "4090d4a8c5f5e38a42139efda864134cdf478b3c34": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "togglePromptValidatedAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -111,7 +159,7 @@
     "00211c9131a9d24963155538726b8b5ae796c905ba": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "listOpenReportsAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -123,7 +171,7 @@
     "4061dc5da1fda46c09344b591266ddaa70a87ba047": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "saveModeratedPromptAction",
           "filename": "src/app/moderacion/actions.ts"
@@ -135,7 +183,7 @@
     "005caa01a0605c8f8ba82c47e8c9de0b1980ae6954": {
       "workers": {
         "app/moderacion/page": {
-          "moduleId": 82253,
+          "moduleId": 53718,
           "async": false,
           "exportedName": "listTaxonomyAction",
           "filename": "src/app/moderacion/taxonomy-actions.ts"

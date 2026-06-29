@@ -7,8 +7,8 @@ export default function LoginPage() {
       <div className="auth-grid">
         <section className="side-panel stack">
           <span className="eyebrow">Acceso</span>
-          <h2>Usuarios registrados</h2>
-          <p className="muted">Accede a tu biblioteca, favoritos, puntos y contribuciones.</p>
+          <h2>Regístrate para disfrutar de todas las ventajas</h2>
+          <p className="muted">Crea tu biblioteca, guarda favoritos, recibe puntos y comparte prompts con la comunidad.</p>
           <Link className="button secondary" href="/registro">
             Crear cuenta
           </Link>

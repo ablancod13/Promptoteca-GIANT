@@ -2,22 +2,24 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, BookOpen, Code2, Library, Search, ShieldCheck, Upload, UserRound } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Bell, BookOpen, Code2, Library, Search, ShieldCheck, Trash2, Upload, UserRound, X } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
 import { getCurrentProfileAction } from "@/app/auth/actions";
+import {
+  deleteAllNotificationsAction,
+  deleteNotificationAction,
+  listNotificationsAction,
+  markAllNotificationsReadAction,
+  type NotificationView
+} from "@/app/notificaciones/actions";
 import { canDevelop, canModerate, getLocalUser, saveLocalUser, type LocalUser } from "@/lib/local-user";
 import { LevelAvatar } from "@/components/LevelAvatar";
-
-interface NotificationItem {
-  id: string;
-  title: string;
-  createdAt: string;
-  read?: boolean;
-}
 
 export function AppHeader() {
   const [user, setUser] = useState<LocalUser | null>(null);
   const [openNotifications, setOpenNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationView[]>([]);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setUser(getLocalUser());
@@ -26,6 +28,8 @@ export function AppHeader() {
       saveLocalUser(remoteUser);
       setUser(remoteUser);
     });
+    void refreshNotifications();
+
     const refresh = () => setUser(getLocalUser());
     window.addEventListener("giant:user-updated", refresh);
     window.addEventListener("storage", refresh);
@@ -35,22 +39,37 @@ export function AppHeader() {
     };
   }, []);
 
-  const notifications = useMemo<NotificationItem[]>(
-    () => [
-      { id: "n1", title: "Prompt aprobado", createdAt: "2026-06-24T08:00:00.000Z" },
-      { id: "n2", title: "Prompt con 5 me gusta", createdAt: "2026-06-26T08:00:00.000Z" },
-      { id: "n3", title: "Prompt modificado", createdAt: "2026-06-27T08:00:00.000Z" }
-    ],
-    []
-  );
-  const hasUnread = Boolean(user && notifications.some((item) => !user.notificationsReadAt || item.createdAt > user.notificationsReadAt));
+  const hasUnread = notifications.some((item) => !item.read);
 
-  function readNotifications() {
-    if (!user) return;
-    const next = { ...user, notificationsReadAt: new Date().toISOString() };
-    saveLocalUser(next);
-    setUser(next);
-    setOpenNotifications((current) => !current);
+  async function refreshNotifications() {
+    const items = await listNotificationsAction();
+    setNotifications(items);
+  }
+
+  function toggleNotifications() {
+    const nextOpen = !openNotifications;
+    setOpenNotifications(nextOpen);
+    if (nextOpen) {
+      startTransition(async () => {
+        await markAllNotificationsReadAction();
+        setNotifications((current) => current.map((item) => ({ ...item, read: true })));
+        await refreshNotifications();
+      });
+    }
+  }
+
+  function deleteOne(notificationId: string) {
+    startTransition(async () => {
+      const result = await deleteNotificationAction(notificationId);
+      if (result.ok) setNotifications((current) => current.filter((item) => item.id !== notificationId));
+    });
+  }
+
+  function deleteAll() {
+    startTransition(async () => {
+      const result = await deleteAllNotificationsAction();
+      if (result.ok) setNotifications([]);
+    });
   }
 
   return (
@@ -58,9 +77,7 @@ export function AppHeader() {
       <div className="site-header-inner">
         <Link href="/" className="brand" aria-label="Promptoteca GIANT">
           <Image src="/giant-logo.png" alt="" width={150} height={82} priority />
-          <span>
-            Promptoteca GIANT
-          </span>
+          <span>Promptoteca GIANT</span>
         </Link>
         <nav className="nav" aria-label="Navegación principal">
           <Link className="nav-link" href="/prompts">
@@ -89,15 +106,36 @@ export function AppHeader() {
                   className={`icon-button notification-button ${hasUnread ? "unread" : ""}`}
                   type="button"
                   title="Notificaciones"
-                  onClick={readNotifications}
+                  onClick={toggleNotifications}
                 >
                   <Bell size={18} fill={hasUnread ? "currentColor" : "none"} />
                 </button>
                 {openNotifications ? (
                   <div className="notification-menu">
-                    {notifications.map((item) => (
-                      <span key={item.id}>{item.title}</span>
-                    ))}
+                    <div className="notification-menu-head">
+                      <strong>Notificaciones</strong>
+                      {notifications.length ? (
+                        <button className="chip-remove" type="button" onClick={deleteAll} disabled={isPending} title="Eliminar todas">
+                          <Trash2 size={14} />
+                        </button>
+                      ) : null}
+                    </div>
+                    {notifications.length ? (
+                      notifications.map((item) => (
+                        <article className="notification-item" key={item.id}>
+                          <div>
+                            <strong>{item.title}</strong>
+                            <span>{item.body}</span>
+                            <small>{new Date(item.createdAt).toLocaleString("es-ES")}</small>
+                          </div>
+                          <button className="chip-remove" type="button" onClick={() => deleteOne(item.id)} disabled={isPending} title="Eliminar">
+                            <X size={14} />
+                          </button>
+                        </article>
+                      ))
+                    ) : (
+                      <span className="muted">Sin notificaciones.</span>
+                    )}
                   </div>
                 ) : null}
               </div>
