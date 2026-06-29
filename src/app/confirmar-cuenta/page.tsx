@@ -28,8 +28,9 @@ export default async function ConfirmAccountPage({
             <a className="button primary" href={confirmationUrl}>
               <CheckCircle2 size={17} /> Confirmar cuenta
             </a>
-            <p className="muted">Si el botón no responde, copia y abre este enlace en el navegador:</p>
-            <p className="muted break-link">{confirmationUrl}</p>
+            <p className="muted">
+              Si no se completa la confirmación, vuelve al correo y utiliza el código de confirmación.
+            </p>
           </>
         ) : (
           <>
