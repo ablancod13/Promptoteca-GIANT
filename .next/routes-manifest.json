@@ -87,6 +87,12 @@
       "namedRegex": "^/api/search(?:/)?$"
     },
     {
+      "page": "/auth/callback",
+      "regex": "^/auth/callback(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/callback(?:/)?$"
+    },
+    {
       "page": "/biblioteca",
       "regex": "^/biblioteca(?:/)?$",
       "routeKeys": {},

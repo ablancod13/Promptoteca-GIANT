@@ -3,6 +3,7 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/admin/page": "app/admin/page.js",
   "/api/search/route": "app/api/search/route.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
   "/biblioteca/page": "app/biblioteca/page.js",
   "/categorias/[slug]/page": "app/categorias/[slug]/page.js",
   "/desarrollador/page": "app/desarrollador/page.js",

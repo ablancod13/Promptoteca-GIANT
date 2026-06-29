@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Info, LogIn, UserPlus } from "lucide-react";
+import { loginAction, registerAction } from "@/app/auth/actions";
 import { PROFESSIONAL_ROLES, RECOMMENDED_TOOLS } from "@/lib/constants";
 import {
   COUNTRIES_ES,
@@ -11,14 +12,14 @@ import {
   PRIMARY_ACTIVITY_AREAS,
   SPAIN_AUTONOMOUS_COMMUNITIES
 } from "@/lib/registration-options";
-import { saveLocalUser, type LocalUser } from "@/lib/local-user";
+import { saveLocalUser } from "@/lib/local-user";
 
 const ROLES_WITH_DETAIL = new Set(["Otro", "Estudiante", "Residente"]);
-const DISPLAY_NAMES_KEY = "giant_display_names";
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const router = useRouter();
   const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
   const isRegister = mode === "register";
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -27,54 +28,54 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     const email = String(data.get("email") ?? "");
     const displayName = normalizeDisplayName(String(data.get("displayName") ?? ""));
 
-    if (isRegister) {
-      if (!displayName) {
-        setMessage("El nombre a mostrar es obligatorio.");
-        return;
-      }
-      if (isDisplayNameTaken(displayName)) {
-        setMessage("Ese nombre a mostrar ya está en uso. Elige otro.");
-        return;
-      }
+    if (isRegister && !displayName) {
+      setMessage("El nombre a mostrar es obligatorio.");
+      return;
     }
 
     const selectedTools = data.getAll("aiTools").map(String);
-    const otherTool = String(data.get("aiToolsOther") ?? "").trim();
-    const aiTools = selectedTools.includes("Otro") && otherTool
-      ? [...selectedTools.filter((tool) => tool !== "Otro"), `Otro: ${otherTool}`]
-      : selectedTools;
+    setMessage("");
 
-    const user: LocalUser = {
-      email,
-      name: String(data.get("name") ?? "") || "Usuario",
-      surname: String(data.get("surname") ?? ""),
-      displayName: displayName || String(data.get("email") ?? "Usuario GIANT").split("@")[0],
-      role: String(data.get("professionalRole") ?? "registered"),
-      platformRole: "registered",
-      xp: 186,
-      createdAt: new Date().toISOString(),
-      country: String(data.get("country") ?? ""),
-      region: String(data.get("region") ?? ""),
-      city: String(data.get("city") ?? ""),
-      birthYear: String(data.get("birthYear") ?? ""),
-      roleDetail: String(data.get("roleDetail") ?? ""),
-      specializationYear: String(data.get("specializationYear") ?? ""),
-      institution: String(data.get("institution") ?? ""),
-      seimcMember: String(data.get("seimcMember") ?? ""),
-      licenseNumber: String(data.get("licenseNumber") ?? ""),
-      institutionType: String(data.get("institutionType") ?? ""),
-      primaryActivityArea: String(data.get("primaryActivityArea") ?? ""),
-      professionalExperienceYears: String(data.get("professionalExperienceYears") ?? ""),
-      aiFrequency: String(data.get("aiFrequency") ?? ""),
-      aiProfessionalUse: String(data.get("aiProfessionalUse") ?? ""),
-      aiLevel: String(data.get("aiLevel") ?? ""),
-      aiTools
-    };
+    startTransition(async () => {
+      const result = isRegister
+        ? await registerAction({
+            email,
+            password: String(data.get("password") ?? ""),
+            name: String(data.get("name") ?? ""),
+            surname: String(data.get("surname") ?? ""),
+            displayName,
+            country: String(data.get("country") ?? ""),
+            region: String(data.get("region") ?? ""),
+            city: String(data.get("city") ?? ""),
+            birthYear: String(data.get("birthYear") ?? ""),
+            professionalRole: String(data.get("professionalRole") ?? ""),
+            roleDetail: String(data.get("roleDetail") ?? ""),
+            specializationYear: String(data.get("specializationYear") ?? ""),
+            institution: String(data.get("institution") ?? ""),
+            seimcMember: String(data.get("seimcMember") ?? ""),
+            licenseNumber: String(data.get("licenseNumber") ?? ""),
+            institutionType: String(data.get("institutionType") ?? ""),
+            primaryActivityArea: String(data.get("primaryActivityArea") ?? ""),
+            professionalExperienceYears: String(data.get("professionalExperienceYears") ?? ""),
+            aiFrequency: String(data.get("aiFrequency") ?? ""),
+            aiProfessionalUse: String(data.get("aiProfessionalUse") ?? ""),
+            aiLevel: String(data.get("aiLevel") ?? ""),
+            aiTools: selectedTools,
+            aiToolsOther: String(data.get("aiToolsOther") ?? "")
+          })
+        : await loginAction({
+            email,
+            password: String(data.get("password") ?? "")
+          });
 
-    if (isRegister) reserveDisplayName(displayName);
-    saveLocalUser(user);
-    setMessage(isRegister ? "Cuenta creada en este navegador." : "Sesión iniciada.");
-    window.setTimeout(() => router.push("/perfil"), 450);
+      setMessage(result.message);
+      if (!result.ok) return;
+
+      if (result.user) {
+        saveLocalUser(result.user);
+        router.push("/perfil");
+      }
+    });
   }
 
   return (
@@ -110,9 +111,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         </label>
       </div>
       {isRegister ? <ProfileFields /> : null}
-      <button className="button primary" type="submit">
+      <button className="button primary" type="submit" disabled={isPending}>
         {isRegister ? <UserPlus size={17} /> : <LogIn size={17} />}
-        {isRegister ? "Crear cuenta" : "Entrar"}
+        {isPending ? "Procesando..." : isRegister ? "Crear cuenta" : "Entrar"}
       </button>
       {message ? <div className="callout">{message}</div> : null}
     </form>
@@ -329,19 +330,4 @@ function ProfileFields() {
 
 function normalizeDisplayName(value: string) {
   return value.trim().replace(/\s+/g, " ");
-}
-
-function getReservedDisplayNames() {
-  const stored = window.localStorage.getItem(DISPLAY_NAMES_KEY);
-  return stored ? (JSON.parse(stored) as string[]) : [];
-}
-
-function isDisplayNameTaken(value: string) {
-  const normalized = value.toLocaleLowerCase("es");
-  return getReservedDisplayNames().some((item) => item.toLocaleLowerCase("es") === normalized);
-}
-
-function reserveDisplayName(value: string) {
-  const current = getReservedDisplayNames();
-  window.localStorage.setItem(DISPLAY_NAMES_KEY, JSON.stringify([...current, value]));
 }

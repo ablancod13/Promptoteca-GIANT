@@ -1,5 +1,192 @@
 {
-  "node": {},
+  "node": {
+    "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
+      "workers": {
+        "app/_not-found/page": {
+          "moduleId": 27691,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/admin/page": {
+          "moduleId": 97686,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/biblioteca/page": {
+          "moduleId": 15301,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/categorias/[slug]/page": {
+          "moduleId": 54777,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/desarrollador/page": {
+          "moduleId": 96707,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/legal/privacidad/page": {
+          "moduleId": 70290,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/legal/terminos/page": {
+          "moduleId": 51872,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/login/page": {
+          "moduleId": 41844,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/moderacion/page": {
+          "moduleId": 265,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/moderacion/prompts/[slug]/page": {
+          "moduleId": 6958,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/page": {
+          "moduleId": 2648,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/perfil/page": {
+          "moduleId": 89711,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/prompts/[slug]/editar/page": {
+          "moduleId": 98933,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/prompts/[slug]/page": {
+          "moduleId": 20789,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/prompts/page": {
+          "moduleId": 47041,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/quienes-somos/page": {
+          "moduleId": 54599,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/registro/page": {
+          "moduleId": 91232,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/subir/page": {
+          "moduleId": 83487,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "filename": "src/app/auth/actions.ts",
+      "exportedName": "getCurrentProfileAction"
+    },
+    "404fb620eeb560d6c27f78d96a38ca5a17493c9e66": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": 41844,
+          "async": false,
+          "exportedName": "loginAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/registro/page": {
+          "moduleId": 91232,
+          "async": false,
+          "exportedName": "loginAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "filename": "src/app/auth/actions.ts",
+      "exportedName": "loginAction"
+    },
+    "40a0ba5f6dda26abcbeb53217eb59993f40234eece": {
+      "workers": {
+        "app/login/page": {
+          "moduleId": 41844,
+          "async": false,
+          "exportedName": "registerAction",
+          "filename": "src/app/auth/actions.ts"
+        },
+        "app/registro/page": {
+          "moduleId": 91232,
+          "async": false,
+          "exportedName": "registerAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "filename": "src/app/auth/actions.ts",
+      "exportedName": "registerAction"
+    },
+    "002fa4f94d711bd76db9ea3fd8fe99d70c4fbc0cef": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 89711,
+          "async": false,
+          "exportedName": "deleteAccountAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "filename": "src/app/auth/actions.ts",
+      "exportedName": "deleteAccountAction"
+    },
+    "00603f8441ced18bc1cddc1868a15b2c1b6cf0280d": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 89711,
+          "async": false,
+          "exportedName": "logoutAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "filename": "src/app/auth/actions.ts",
+      "exportedName": "logoutAction"
+    },
+    "40dcf2f7730ab9a2112ae6ecbca85000e091a4fd0a": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 89711,
+          "async": false,
+          "exportedName": "updateProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "filename": "src/app/auth/actions.ts",
+      "exportedName": "updateProfileAction"
+    }
+  },
   "edge": {},
   "encryptionKey": "lPEPVa8x+JMvw+TFzYwcHDFmeme6o1IOpLezTNb5Sgg="
 }

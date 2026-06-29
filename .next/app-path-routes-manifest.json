@@ -3,6 +3,7 @@
   "/_not-found/page": "/_not-found",
   "/admin/page": "/admin",
   "/api/search/route": "/api/search",
+  "/auth/callback/route": "/auth/callback",
   "/biblioteca/page": "/biblioteca",
   "/categorias/[slug]/page": "/categorias/[slug]",
   "/desarrollador/page": "/desarrollador",

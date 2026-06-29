@@ -1,4 +1,41 @@
 {
-  "node": {},
+  "node": {
+    "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
+      "workers": {
+        "app/registro/page": {
+          "moduleId": 91232,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "exportedName": "getCurrentProfileAction",
+      "filename": "src/app/auth/actions.ts"
+    },
+    "404fb620eeb560d6c27f78d96a38ca5a17493c9e66": {
+      "workers": {
+        "app/registro/page": {
+          "moduleId": 91232,
+          "async": false,
+          "exportedName": "loginAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "exportedName": "loginAction",
+      "filename": "src/app/auth/actions.ts"
+    },
+    "40a0ba5f6dda26abcbeb53217eb59993f40234eece": {
+      "workers": {
+        "app/registro/page": {
+          "moduleId": 91232,
+          "async": false,
+          "exportedName": "registerAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "exportedName": "registerAction",
+      "filename": "src/app/auth/actions.ts"
+    }
+  },
   "edge": {}
 }

@@ -1,4 +1,17 @@
 {
-  "node": {},
+  "node": {
+    "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
+      "workers": {
+        "app/moderacion/page": {
+          "moduleId": 265,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "exportedName": "getCurrentProfileAction",
+      "filename": "src/app/auth/actions.ts"
+    }
+  },
   "edge": {}
 }

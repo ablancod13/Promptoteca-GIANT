@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Award, Camera, Edit3, Heart, LogOut, Save, ShieldCheck, Star, Trash2, Upload } from "lucide-react";
+import { deleteAccountAction, getCurrentProfileAction, logoutAction, updateProfileAction } from "@/app/auth/actions";
 import { PROFESSIONAL_ROLES } from "@/lib/constants";
 import { COUNTRIES_ES, SPAIN_AUTONOMOUS_COMMUNITIES } from "@/lib/registration-options";
-import { canDevelop, canModerate, getLocalUser, LOCAL_USER_KEY, saveLocalUser, type LocalUser } from "@/lib/local-user";
+import { canDevelop, canModerate, LOCAL_USER_KEY, getLocalUser, saveLocalUser, type LocalUser } from "@/lib/local-user";
 import { getProgressToNextLevel } from "@/lib/gamification";
 import type { Prompt } from "@/lib/types";
 import { LevelAvatar } from "@/components/LevelAvatar";
@@ -34,7 +35,17 @@ const BADGES: BadgeDefinition[] = [
   { id: "referente", name: "Referente GIANT", description: "Sus aportes generan uso y reconocimiento.", minXp: 750 }
 ];
 
-const DISPLAY_NAMES_KEY = "giant_display_names";
+const LOCAL_ACCOUNT_KEYS = [
+  LOCAL_USER_KEY,
+  "giant_favorites",
+  "giant_likes",
+  "giant_private_folders",
+  "giant_favorite_folders",
+  "giant_private_notes",
+  "giant_private_prompt_edits",
+  "giant_custom_versions",
+  "giant_xp_ledger"
+];
 
 export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
   const router = useRouter();
@@ -43,29 +54,41 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
   const [settingsRole, setSettingsRole] = useState(PROFESSIONAL_ROLES[0]);
   const [settingsMessage, setSettingsMessage] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const refresh = () => {
+    let cancelled = false;
+    const refreshFromLocal = () => {
       const current = getLocalUser();
       setUser(current);
       setSettingsCountry(current?.country || "España");
       setSettingsRole(current?.role || PROFESSIONAL_ROLES[0]);
     };
-    refresh();
-    window.addEventListener("giant:user-updated", refresh);
-    window.addEventListener("storage", refresh);
+
+    refreshFromLocal();
+    getCurrentProfileAction().then((remoteUser) => {
+      if (cancelled || !remoteUser) return;
+      saveLocalUser(remoteUser);
+      setUser(remoteUser);
+      setSettingsCountry(remoteUser.country || "España");
+      setSettingsRole(remoteUser.role || PROFESSIONAL_ROLES[0]);
+    });
+
+    window.addEventListener("giant:user-updated", refreshFromLocal);
+    window.addEventListener("storage", refreshFromLocal);
     return () => {
-      window.removeEventListener("giant:user-updated", refresh);
-      window.removeEventListener("storage", refresh);
+      cancelled = true;
+      window.removeEventListener("giant:user-updated", refreshFromLocal);
+      window.removeEventListener("storage", refreshFromLocal);
     };
   }, []);
 
   const progress = getProgressToNextLevel(user?.xp ?? 0);
   const contributed = useMemo(() => prompts.slice(0, 4), [prompts]);
   const earnedBadges = BADGES.filter((badge) => (user?.xp ?? 0) >= badge.minXp);
-  const settingsIsSpain = settingsCountry === "España";
+  const settingsIsSpain = isSpainCountry(settingsCountry);
 
-  async function shareBadge(badge: (typeof BADGES)[number]) {
+  async function shareBadge(badge: BadgeDefinition) {
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
     canvas.height = 630;
@@ -87,7 +110,7 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
     ctx.fillText(badge.description, 110, 380);
     ctx.fillStyle = "#6B7280";
     ctx.font = "28px Arial";
-    ctx.fillText(`Conseguido por ${user?.name ?? "Usuario GIANT"}`, 110, 470);
+    ctx.fillText(`Conseguido por ${user?.displayName ?? user?.name ?? "Usuario GIANT"}`, 110, 470);
 
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
     if (!blob) return;
@@ -111,30 +134,36 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
     if (!user) return;
 
     const data = new FormData(event.currentTarget);
-    const next: LocalUser = {
-      ...user,
-      displayName: normalizeDisplayName(String(data.get("displayName") ?? user.displayName ?? user.name)) || user.displayName || user.name,
-      country: String(data.get("country") ?? user.country ?? ""),
-      region: String(data.get("region") ?? ""),
-      city: String(data.get("city") ?? ""),
-      role: String(data.get("professionalRole") ?? user.role),
-      institution: String(data.get("institution") ?? ""),
-      seimcMember: String(data.get("seimcMember") ?? "")
-    };
-    if (next.displayName && next.displayName !== user.displayName && isDisplayNameTaken(next.displayName)) {
-      setSettingsMessage("Ese nombre a mostrar ya está en uso. Elige otro.");
-      return;
-    }
-    if (next.displayName && next.displayName !== user.displayName) reserveDisplayName(next.displayName);
-    saveLocalUser(next);
-    setUser(next);
-    setSettingsMessage("Configuración guardada.");
+    setSettingsMessage("");
+
+    startTransition(async () => {
+      const result = await updateProfileAction({
+        displayName:
+          normalizeDisplayName(String(data.get("displayName") ?? user.displayName ?? user.name)) || user.displayName || user.name,
+        country: String(data.get("country") ?? user.country ?? ""),
+        region: String(data.get("region") ?? ""),
+        city: String(data.get("city") ?? ""),
+        professionalRole: String(data.get("professionalRole") ?? user.role),
+        institution: String(data.get("institution") ?? ""),
+        seimcMember: String(data.get("seimcMember") ?? "")
+      });
+
+      setSettingsMessage(result.message);
+      if (result.ok && result.user) {
+        saveLocalUser(result.user);
+        setUser(result.user);
+        setSettingsCountry(result.user.country || "España");
+        setSettingsRole(result.user.role || PROFESSIONAL_ROLES[0]);
+      }
+    });
   }
 
   function logout() {
-    window.localStorage.removeItem(LOCAL_USER_KEY);
-    window.dispatchEvent(new CustomEvent("giant:user-updated"));
-    router.push("/");
+    startTransition(async () => {
+      await logoutAction();
+      clearLocalAccountData();
+      router.push("/");
+    });
   }
 
   function deleteAccount() {
@@ -144,26 +173,13 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
       return;
     }
 
-    if (user.displayName) {
-      const nextNames = getReservedDisplayNames().filter(
-        (item) => item.toLocaleLowerCase("es") !== user.displayName?.toLocaleLowerCase("es")
-      );
-      window.localStorage.setItem(DISPLAY_NAMES_KEY, JSON.stringify(nextNames));
-    }
-
-    [
-      LOCAL_USER_KEY,
-      "giant_favorites",
-      "giant_likes",
-      "giant_private_folders",
-      "giant_favorite_folders",
-      "giant_private_notes",
-      "giant_private_prompt_edits",
-      "giant_custom_versions",
-      "giant_xp_ledger"
-    ].forEach((key) => window.localStorage.removeItem(key));
-    window.dispatchEvent(new CustomEvent("giant:user-updated"));
-    router.push("/");
+    startTransition(async () => {
+      const result = await deleteAccountAction();
+      setSettingsMessage(result.message);
+      if (!result.ok) return;
+      clearLocalAccountData();
+      router.push("/");
+    });
   }
 
   if (!user) {
@@ -209,7 +225,7 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
         <div className="section-head compact">
           <h2>Configuración</h2>
           <div className="action-row">
-            <button className="button secondary" type="button" onClick={logout}>
+            <button className="button secondary" type="button" onClick={logout} disabled={isPending}>
               <LogOut size={16} /> Cerrar sesión
             </button>
           </div>
@@ -304,15 +320,15 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
             </p>
           </div>
           <div className="action-row">
-            <button className="button primary" type="submit">
+            <button className="button primary" type="submit" disabled={isPending}>
               <Save size={16} /> Guardar configuración
             </button>
-            <button className="button danger" type="button" onClick={deleteAccount}>
+            <button className="button danger" type="button" onClick={deleteAccount} disabled={isPending}>
               <Trash2 size={16} /> {confirmDelete ? "Confirmar eliminación" : "Eliminar cuenta"}
             </button>
           </div>
           {settingsMessage ? <div className="callout">{settingsMessage}</div> : null}
-          {confirmDelete ? <div className="callout warning">Pulsa de nuevo para confirmar la eliminación de la cuenta local.</div> : null}
+          {confirmDelete ? <div className="callout warning">Pulsa de nuevo para confirmar la eliminación de la cuenta.</div> : null}
         </form>
       </section>
 
@@ -339,7 +355,7 @@ export function ProfileClient({ prompts }: { prompts: Prompt[] }) {
         <div className="grid four">
           {earnedBadges.map((badge) => (
             <article className="achievement" key={badge.id}>
-              {"imageUrl" in badge && badge.imageUrl ? (
+              {badge.imageUrl ? (
                 <img className="badge-image" src={badge.imageUrl} alt={badge.imageAlt ?? badge.name} />
               ) : (
                 <Award size={28} />
@@ -428,17 +444,11 @@ function normalizeDisplayName(value: string) {
   return value.trim().replace(/\s+/g, " ");
 }
 
-function getReservedDisplayNames() {
-  const stored = window.localStorage.getItem(DISPLAY_NAMES_KEY);
-  return stored ? (JSON.parse(stored) as string[]) : [];
+function isSpainCountry(value: string) {
+  return value.trim().toLocaleLowerCase("es").startsWith("espa");
 }
 
-function isDisplayNameTaken(value: string) {
-  const normalized = value.toLocaleLowerCase("es");
-  return getReservedDisplayNames().some((item) => item.toLocaleLowerCase("es") === normalized);
-}
-
-function reserveDisplayName(value: string) {
-  const current = getReservedDisplayNames();
-  window.localStorage.setItem(DISPLAY_NAMES_KEY, JSON.stringify([...current, value]));
+function clearLocalAccountData() {
+  LOCAL_ACCOUNT_KEYS.forEach((key) => window.localStorage.removeItem(key));
+  window.dispatchEvent(new CustomEvent("giant:user-updated"));
 }

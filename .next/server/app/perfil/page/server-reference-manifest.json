@@ -1,4 +1,53 @@
 {
-  "node": {},
+  "node": {
+    "0001c3c4f542b962214d8612d6ef08a60b27fdc157": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 89711,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "exportedName": "getCurrentProfileAction",
+      "filename": "src/app/auth/actions.ts"
+    },
+    "002fa4f94d711bd76db9ea3fd8fe99d70c4fbc0cef": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 89711,
+          "async": false,
+          "exportedName": "deleteAccountAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "exportedName": "deleteAccountAction",
+      "filename": "src/app/auth/actions.ts"
+    },
+    "00603f8441ced18bc1cddc1868a15b2c1b6cf0280d": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 89711,
+          "async": false,
+          "exportedName": "logoutAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "exportedName": "logoutAction",
+      "filename": "src/app/auth/actions.ts"
+    },
+    "40dcf2f7730ab9a2112ae6ecbca85000e091a4fd0a": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 89711,
+          "async": false,
+          "exportedName": "updateProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "exportedName": "updateProfileAction",
+      "filename": "src/app/auth/actions.ts"
+    }
+  },
   "edge": {}
 }

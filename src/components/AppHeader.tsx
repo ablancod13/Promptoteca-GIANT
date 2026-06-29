@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bell, BookOpen, Code2, Library, Search, ShieldCheck, Upload, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { getCurrentProfileAction } from "@/app/auth/actions";
 import { canDevelop, canModerate, getLocalUser, saveLocalUser, type LocalUser } from "@/lib/local-user";
 import { LevelAvatar } from "@/components/LevelAvatar";
 
@@ -20,6 +21,11 @@ export function AppHeader() {
 
   useEffect(() => {
     setUser(getLocalUser());
+    getCurrentProfileAction().then((remoteUser) => {
+      if (!remoteUser) return;
+      saveLocalUser(remoteUser);
+      setUser(remoteUser);
+    });
     const refresh = () => setUser(getLocalUser());
     window.addEventListener("giant:user-updated", refresh);
     window.addEventListener("storage", refresh);
