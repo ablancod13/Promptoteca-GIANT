@@ -6,6 +6,7 @@
   "/auth/callback/route": "/auth/callback",
   "/biblioteca/page": "/biblioteca",
   "/categorias/[slug]/page": "/categorias/[slug]",
+  "/confirmar-cuenta/page": "/confirmar-cuenta",
   "/desarrollador/page": "/desarrollador",
   "/legal/privacidad/page": "/legal/privacidad",
   "/legal/terminos/page": "/legal/terminos",

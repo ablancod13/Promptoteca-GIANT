@@ -26,6 +26,12 @@
           "exportedName": "getCurrentProfileAction",
           "filename": "src/app/auth/actions.ts"
         },
+        "app/confirmar-cuenta/page": {
+          "moduleId": 28832,
+          "async": false,
+          "exportedName": "getCurrentProfileAction",
+          "filename": "src/app/auth/actions.ts"
+        },
         "app/desarrollador/page": {
           "moduleId": 96707,
           "async": false,

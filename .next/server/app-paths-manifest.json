@@ -6,6 +6,7 @@
   "/auth/callback/route": "app/auth/callback/route.js",
   "/biblioteca/page": "app/biblioteca/page.js",
   "/categorias/[slug]/page": "app/categorias/[slug]/page.js",
+  "/confirmar-cuenta/page": "app/confirmar-cuenta/page.js",
   "/desarrollador/page": "app/desarrollador/page.js",
   "/legal/privacidad/page": "app/legal/privacidad/page.js",
   "/legal/terminos/page": "app/legal/terminos/page.js",

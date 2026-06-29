@@ -222,6 +222,19 @@
     ]
   },
   {
+    "route": "/confirmar-cuenta",
+    "firstLoadUncompressedJsBytes": 547014,
+    "firstLoadChunkPaths": [
+      ".next\\static\\chunks\\108s8cery799f.js",
+      ".next\\static\\chunks\\0q2pe_jup165u.js",
+      ".next\\static\\chunks\\3n1v8qmvzy0md.js",
+      ".next\\static\\chunks\\3-hcgnhdc43b5.js",
+      ".next\\static\\chunks\\1mmkg56nlctga.js",
+      ".next\\static\\chunks\\2oc3x2of9rr9i.js",
+      ".next\\static\\chunks\\turbopack-0zlq0kdkjuo-m.js"
+    ]
+  },
+  {
     "route": "/legal/privacidad",
     "firstLoadUncompressedJsBytes": 547014,
     "firstLoadChunkPaths": [

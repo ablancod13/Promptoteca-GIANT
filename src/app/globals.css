@@ -644,6 +644,10 @@ p {
   color: var(--muted);
 }
 
+.break-link {
+  overflow-wrap: anywhere;
+}
+
 .filters {
   display: grid;
   grid-template-columns: minmax(220px, 1.5fr) repeat(4, minmax(120px, 1fr)) auto;
