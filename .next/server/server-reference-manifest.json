@@ -120,6 +120,18 @@
       "filename": "src/app/auth/actions.ts",
       "exportedName": "getCurrentProfileAction"
     },
+    "403712476cab0a5aae9964f25dd760fed192560a79": {
+      "workers": {
+        "app/confirmar-cuenta/page": {
+          "moduleId": 28832,
+          "async": false,
+          "exportedName": "verifySignupOtpAction",
+          "filename": "src/app/auth/actions.ts"
+        }
+      },
+      "filename": "src/app/auth/actions.ts",
+      "exportedName": "verifySignupOtpAction"
+    },
     "404fb620eeb560d6c27f78d96a38ca5a17493c9e66": {
       "workers": {
         "app/login/page": {

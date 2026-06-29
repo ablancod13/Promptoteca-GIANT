@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CheckCircle2, MailCheck } from "lucide-react";
+import { ConfirmAccountOtpForm } from "@/components/ConfirmAccountOtpForm";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -16,9 +17,7 @@ export default async function ConfirmAccountPage({
       <section className="form-panel stack">
         <span className="eyebrow">Confirmación de cuenta</span>
         <h1>Activa tu cuenta</h1>
-        <p className="lead">
-          Estás a un paso de entrar en la Promptoteca GIANT.
-        </p>
+        <p className="lead">Estás a un paso de entrar en la Promptoteca GIANT.</p>
 
         {confirmationUrl ? (
           <>
@@ -29,17 +28,16 @@ export default async function ConfirmAccountPage({
             <a className="button primary" href={confirmationUrl}>
               <CheckCircle2 size={17} /> Confirmar cuenta
             </a>
-            <p className="muted">
-              Si el botón no responde, copia y abre este enlace en el navegador:
-            </p>
+            <p className="muted">Si el botón no responde, copia y abre este enlace en el navegador:</p>
             <p className="muted break-link">{confirmationUrl}</p>
           </>
         ) : (
           <>
             <div className="callout warning">
-              No hemos podido leer el enlace de confirmación. Solicita un nuevo correo de registro.
+              No hemos podido leer el enlace de confirmación. Puedes confirmar la cuenta con el código del correo.
             </div>
-            <Link className="button primary" href="/login">
+            <ConfirmAccountOtpForm />
+            <Link className="button secondary" href="/login">
               Ir a iniciar sesión
             </Link>
           </>
@@ -50,6 +48,14 @@ export default async function ConfirmAccountPage({
 }
 
 function buildConfirmationUrl(params: SearchParams) {
+  const tokenHash = getParam(params, "token_hash") || getParam(params, "token");
+  if (tokenHash) {
+    const type = getParam(params, "type") || "signup";
+    const next = getParam(params, "next") || "/perfil";
+    const query = new URLSearchParams({ token_hash: tokenHash, type, next });
+    return `/auth/confirm?${query.toString()}`;
+  }
+
   const raw = getParam(params, "confirmation_url");
   if (!raw) return "";
 

@@ -93,6 +93,12 @@
       "namedRegex": "^/auth/callback(?:/)?$"
     },
     {
+      "page": "/auth/confirm",
+      "regex": "^/auth/confirm(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/confirm(?:/)?$"
+    },
+    {
       "page": "/biblioteca",
       "regex": "^/biblioteca(?:/)?$",
       "routeKeys": {},

@@ -4,6 +4,7 @@
   "/admin/page": "/admin",
   "/api/search/route": "/api/search",
   "/auth/callback/route": "/auth/callback",
+  "/auth/confirm/route": "/auth/confirm",
   "/biblioteca/page": "/biblioteca",
   "/categorias/[slug]/page": "/categorias/[slug]",
   "/confirmar-cuenta/page": "/confirmar-cuenta",

@@ -41,6 +41,11 @@ interface LoginPayload {
   password: string;
 }
 
+interface VerifySignupOtpPayload {
+  email: string;
+  token: string;
+}
+
 interface ProfileUpdatePayload {
   displayName: string;
   country: string;
@@ -123,6 +128,27 @@ export async function loginAction(payload: LoginPayload): Promise<AuthResult> {
 
   revalidatePath("/");
   return { ok: true, message: "Sesion iniciada.", user };
+}
+
+export async function verifySignupOtpAction(payload: VerifySignupOtpPayload): Promise<AuthResult> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    return { ok: false, message: "Supabase no esta configurado. Revisa las variables de entorno." };
+  }
+
+  const { error } = await supabase.auth.verifyOtp({
+    email: payload.email.trim().toLocaleLowerCase("es"),
+    token: payload.token.trim(),
+    type: "signup"
+  });
+
+  if (error) return { ok: false, message: translateAuthError(error.message) };
+
+  const user = await getCurrentLocalUser();
+  if (!user) return { ok: false, message: "Cuenta confirmada, pero no se encontro el perfil." };
+
+  revalidatePath("/");
+  return { ok: true, message: "Cuenta confirmada.", user };
 }
 
 export async function logoutAction(): Promise<{ ok: true }> {

@@ -4,6 +4,7 @@
   "/admin/page": "app/admin/page.js",
   "/api/search/route": "app/api/search/route.js",
   "/auth/callback/route": "app/auth/callback/route.js",
+  "/auth/confirm/route": "app/auth/confirm/route.js",
   "/biblioteca/page": "app/biblioteca/page.js",
   "/categorias/[slug]/page": "app/categorias/[slug]/page.js",
   "/confirmar-cuenta/page": "app/confirmar-cuenta/page.js",
