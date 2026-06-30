@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { LEVELS } from "@/lib/constants";
 import type { AboutContent } from "@/lib/about-content";
 import { getAboutContent } from "@/lib/about-repository";
+import { BADGE_RULES, parseBadgeCriterion, type BadgeCriterion, type BadgeRuleKey } from "@/lib/badge-rules";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -20,6 +21,28 @@ export interface DeveloperUser {
 
 export interface DeveloperSettings {
   showRegisteredUsers: boolean;
+}
+
+export interface BadgeDefinitionAdmin {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  imageAlt: string;
+  criterion: BadgeCriterion;
+  criterionLabel: string;
+  shareable: boolean;
+}
+
+export interface SaveBadgePayload {
+  id?: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  imageAlt: string;
+  rule: BadgeRuleKey;
+  threshold: number;
+  shareable: boolean;
 }
 
 type ActionResult = { ok: true; message: string } | { ok: false; message: string };
@@ -87,6 +110,79 @@ export async function updateHomeMetricVisibilityAction(showRegisteredUsers: bool
   revalidatePath("/");
   revalidatePath("/desarrollador");
   return { ok: true, message: "Ajuste del home guardado." };
+}
+
+export async function listBadgeDefinitionsAction(): Promise<BadgeDefinitionAdmin[]> {
+  const context = await getDeveloperContext();
+  if (!context.ok) return [];
+
+  const { data, error } = await context.supabase
+    .from("badges")
+    .select("id,name,description,image_url,image_alt,criterion,shareable")
+    .order("name", { ascending: true });
+
+  if (error || !data) return [];
+
+  return data.map((row) => {
+    const criterion = parseBadgeCriterion(row.criterion);
+    return {
+      id: String(row.id),
+      name: String(row.name ?? ""),
+      description: String(row.description ?? ""),
+      imageUrl: String(row.image_url ?? ""),
+      imageAlt: String(row.image_alt ?? ""),
+      criterion,
+      criterionLabel: formatCriterionLabel(criterion),
+      shareable: row.shareable !== false
+    };
+  });
+}
+
+export async function saveBadgeDefinitionAction(payload: SaveBadgePayload): Promise<ActionResult> {
+  const context = await getDeveloperContext();
+  if (!context.ok) return { ok: false, message: context.message };
+
+  const name = payload.name.trim().replace(/\s+/g, " ");
+  const description = payload.description.trim();
+  const rule = BADGE_RULES.some((item) => item.value === payload.rule) ? payload.rule : "prompts_shared";
+  const threshold = Math.max(1, Math.floor(Number(payload.threshold || 1)));
+  if (!name) return { ok: false, message: "El título del logro es obligatorio." };
+  if (!description) return { ok: false, message: "La descripción del logro es obligatoria." };
+
+  const row = {
+    name,
+    description,
+    icon: "award",
+    image_url: payload.imageUrl.trim() || null,
+    image_alt: payload.imageAlt.trim() || name,
+    criterion: JSON.stringify({ rule, threshold }),
+    shareable: payload.shareable
+  };
+
+  const result = payload.id
+    ? await context.supabase.from("badges").update(row).eq("id", payload.id)
+    : await context.supabase.from("badges").insert(row);
+
+  if (result.error) {
+    const duplicate = result.error.message.toLocaleLowerCase("es").includes("duplicate");
+    return { ok: false, message: duplicate ? "Ya existe un logro con ese título." : "No se pudo guardar el logro." };
+  }
+
+  revalidatePath("/desarrollador");
+  revalidatePath("/perfil");
+  return { ok: true, message: "Logro guardado." };
+}
+
+export async function deleteBadgeDefinitionAction(id: string): Promise<ActionResult> {
+  const context = await getDeveloperContext();
+  if (!context.ok) return { ok: false, message: context.message };
+
+  const { error } = await context.supabase.from("badges").delete().eq("id", id);
+  if (error) return { ok: false, message: "No se pudo eliminar el logro." };
+
+  revalidatePath("/desarrollador");
+  revalidatePath("/perfil");
+  return { ok: true, message: "Logro eliminado." };
 }
 
 export async function setUserAccountStatusAction(userId: string, status: "active" | "blocked"): Promise<ActionResult> {
@@ -217,4 +313,9 @@ async function getDeveloperContext() {
 
 function levelForPoints(points: number) {
   return LEVELS.find((level) => points >= level.minXp && (level.maxXp === null || points <= level.maxXp))?.level ?? 1;
+}
+
+function formatCriterionLabel(criterion: BadgeCriterion) {
+  const label = BADGE_RULES.find((rule) => rule.value === criterion.rule)?.label ?? "Regla";
+  return `${label}: ${criterion.threshold}`;
 }

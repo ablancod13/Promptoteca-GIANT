@@ -17,6 +17,8 @@ export interface SubmitPromptPayload {
   category: string;
   tools: string[];
   language: string;
+  difficulty: Difficulty;
+  tags: string[];
   recommendedModel: string;
   intelligenceLevel: string;
   limitations: string;
@@ -66,8 +68,8 @@ export async function submitPromptAction(payload: SubmitPromptPayload): Promise<
     intelligence_level: payload.intelligenceLevel || null,
     language: payload.language,
     best_language: payload.language,
-    difficulty: "principiante" satisfies Difficulty,
-    tags: [],
+    difficulty: normalizeDifficulty(payload.difficulty),
+    tags: normalizeTags(payload.tags),
     review_status: "pending",
     experimental: payload.experimental,
     validated_by_giant: false,
@@ -127,6 +129,7 @@ export async function submitPromptAction(payload: SubmitPromptPayload): Promise<
       summary: payload.summary,
       content: payload.content,
       category: payload.category,
+      tags: payload.tags,
       tools: payload.tools,
       language: payload.language
     })
@@ -157,6 +160,21 @@ function validatePayload(payload: SubmitPromptPayload) {
   if (!payload.noPatientDataConfirmed) return "Confirma que no contiene datos identificables.";
   if (!payload.licenseAccepted) return "Debes aceptar la licencia CC BY 4.0.";
   return "";
+}
+
+function normalizeDifficulty(value: string): Difficulty {
+  return ["principiante", "intermedio", "avanzado"].includes(value) ? (value as Difficulty) : "principiante";
+}
+
+function normalizeTags(tags: string[]) {
+  return [
+    ...new Set(
+      tags
+        .map((tag) => tag.trim().replace(/\s+/g, " "))
+        .filter(Boolean)
+        .slice(0, 8)
+    )
+  ];
 }
 
 async function createUniqueSlug(admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>, baseSlug: string) {
@@ -226,9 +244,9 @@ async function awardPromptSubmissionPoints(
 async function generatePromptEmbedding(
   admin: NonNullable<ReturnType<typeof createSupabaseAdminClient>>,
   promptId: string,
-  source: { title: string; summary: string; content: string; category: string; tools: string[]; language: string }
+  source: { title: string; summary: string; content: string; category: string; tags: string[]; tools: string[]; language: string }
 ) {
-  const text = [source.title, source.summary, source.category, source.language, source.tools.join(", "), source.content].join("\n");
+  const text = [source.title, source.summary, source.category, source.language, source.tags.join(", "), source.tools.join(", "), source.content].join("\n");
   const embedding = await createEmbedding(text);
   if (!embedding?.embedding.length) return;
 

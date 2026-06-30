@@ -2,29 +2,36 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { CheckCircle2, Send } from "lucide-react";
+import { CheckCircle2, Plus, Send, X } from "lucide-react";
 import { getCurrentProfileAction } from "@/app/auth/actions";
 import { submitPromptAction } from "@/app/subir/actions";
 import { AI_MODELS, INITIAL_CATEGORIES, INTELLIGENCE_LEVELS, MODELS_BY_TOOL, RECOMMENDED_TOOLS } from "@/lib/constants";
 import { getLocalUser, saveLocalUser } from "@/lib/local-user";
 import { detectVariables } from "@/lib/prompt-utils";
 import type { SubmissionModelOption } from "@/lib/repository";
-import type { PromptTool } from "@/lib/types";
+import type { Difficulty, PromptTool } from "@/lib/types";
 
 const LANGUAGE_OPTIONS = ["Español", "Inglés", "Catalán", "Euskera", "Francés", "Italiano", "Otro"];
+const DIFFICULTY_OPTIONS: Array<{ value: Difficulty; label: string }> = [
+  { value: "principiante", label: "Principiante" },
+  { value: "intermedio", label: "Intermedio" },
+  { value: "avanzado", label: "Avanzado" }
+];
 
 interface SubmissionFormProps {
   initialCategories?: string[];
   initialTools?: string[];
   initialModels?: string[];
   initialModelOptions?: SubmissionModelOption[];
+  popularTags?: string[];
 }
 
 export function SubmissionForm({
   initialCategories = [...INITIAL_CATEGORIES],
   initialTools = [...RECOMMENDED_TOOLS],
   initialModels = [...AI_MODELS],
-  initialModelOptions
+  initialModelOptions,
+  popularTags = []
 }: SubmissionFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [content, setContent] = useState("");
@@ -33,11 +40,17 @@ export function SubmissionForm({
   const [isRegistered, setIsRegistered] = useState<boolean | null>(null);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState("Español");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagDraft, setTagDraft] = useState("");
   const [isPending, startTransition] = useTransition();
   const variables = useMemo(() => detectVariables("draft", content), [content]);
 
   const categories = useMemo(() => [...initialCategories].sort((a, b) => a.localeCompare(b, "es")), [initialCategories]);
   const tools = useMemo(() => [...initialTools].sort((a, b) => a.localeCompare(b, "es")), [initialTools]);
+  const tagSuggestions = useMemo(
+    () => [...new Set(popularTags.map(normalizeTag).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")).slice(0, 24),
+    [popularTags]
+  );
   const modelCatalog = useMemo(
     () =>
       (initialModelOptions?.length
@@ -82,6 +95,19 @@ export function SubmissionForm({
     });
   }
 
+  function toggleTag(tag: string) {
+    const clean = normalizeTag(tag);
+    if (!clean) return;
+    setSelectedTags((current) => (current.includes(clean) ? current.filter((item) => item !== clean) : [...current, clean].slice(0, 8)));
+  }
+
+  function addTag() {
+    const clean = normalizeTag(tagDraft);
+    if (!clean) return;
+    setSelectedTags((current) => (current.includes(clean) ? current : [...current, clean].slice(0, 8)));
+    setTagDraft("");
+  }
+
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedTools.length) {
@@ -101,6 +127,8 @@ export function SubmissionForm({
         category: String(form.get("category") ?? ""),
         tools: selectedTools,
         language,
+        difficulty: String(form.get("difficulty") ?? "principiante") as Difficulty,
+        tags: selectedTags,
         recommendedModel: String(form.get("recommendedModel") ?? ""),
         intelligenceLevel: String(form.get("intelligenceLevel") ?? ""),
         limitations: String(form.get("limitations") ?? ""),
@@ -117,6 +145,7 @@ export function SubmissionForm({
       setSent(true);
       setContent("");
       setSelectedTools([]);
+      setSelectedTags([]);
       setSelectedLanguage("Español");
       formRef.current?.reset();
       window.setTimeout(() => setSent(false), 1800);
@@ -196,6 +225,16 @@ export function SubmissionForm({
           </label>
         ) : null}
         <label className="field">
+          <span>Dificultad</span>
+          <select className="select" name="difficulty" defaultValue="principiante">
+            {DIFFICULTY_OPTIONS.map((option) => (
+              <option value={option.value} key={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field">
           <span>Modelo sugerido</span>
           <select className="select" name="recommendedModel">
             <option value="">Sin preferencia</option>
@@ -226,6 +265,46 @@ export function SubmissionForm({
         <span>Texto completo del prompt</span>
         <textarea className="textarea" required value={content} onChange={(event) => setContent(event.target.value)} />
       </label>
+      <div className="field">
+        <span>Tags</span>
+        <div className="badge-row">
+          {tagSuggestions.map((tag) => (
+            <button className={`tag-chip ${selectedTags.includes(tag) ? "selected" : ""}`} type="button" key={tag} onClick={() => toggleTag(tag)}>
+              {tag}
+            </button>
+          ))}
+        </div>
+        <div className="action-row">
+          <input
+            className="input"
+            value={tagDraft}
+            maxLength={40}
+            placeholder="Añadir palabra clave"
+            onChange={(event) => setTagDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                addTag();
+              }
+            }}
+          />
+          <button className="button secondary" type="button" onClick={addTag}>
+            <Plus size={16} /> Añadir
+          </button>
+        </div>
+        {selectedTags.length ? (
+          <div className="badge-row">
+            {selectedTags.map((tag) => (
+              <span className="badge" key={tag}>
+                {tag}
+                <button className="chip-remove" type="button" onClick={() => toggleTag(tag)} title="Quitar tag">
+                  <X size={13} />
+                </button>
+              </span>
+            ))}
+          </div>
+        ) : null}
+      </div>
       <div className="grid two">
         <label className="field">
           <span>Limitaciones</span>
@@ -268,4 +347,8 @@ function uniqueModelNames(models: SubmissionModelOption[]) {
 
 function inferToolForModel(name: string) {
   return (Object.keys(MODELS_BY_TOOL) as PromptTool[]).find((tool) => MODELS_BY_TOOL[tool].includes(name));
+}
+
+function normalizeTag(value: string) {
+  return value.trim().replace(/\s+/g, " ").slice(0, 40);
 }

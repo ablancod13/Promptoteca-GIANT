@@ -319,14 +319,18 @@ export function PromptDetailClient({ prompt }: { prompt: Prompt }) {
             </p>
           </div>
         ) : null}
-        <div>
-          <strong>Limitaciones</strong>
-          <p className="muted">{prompt.limitations}</p>
-        </div>
-        <div>
-          <strong>Riesgos</strong>
-          <p className="muted">{prompt.misuseRisks}</p>
-        </div>
+        {prompt.limitations.trim() ? (
+          <div>
+            <strong>Limitaciones</strong>
+            <p className="muted">{prompt.limitations}</p>
+          </div>
+        ) : null}
+        {prompt.misuseRisks.trim() ? (
+          <div>
+            <strong>Riesgos</strong>
+            <p className="muted">{prompt.misuseRisks}</p>
+          </div>
+        ) : null}
         <div>
           <strong>Licencia</strong>
           <p className="muted">

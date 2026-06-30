@@ -17,35 +17,12 @@ import {
   Upload
 } from "lucide-react";
 import { deleteAccountAction, getCurrentProfileAction, logoutAction, updateProfileAction } from "@/app/auth/actions";
-import { listMyPromptContributionsAction, type PromptContribution } from "@/app/perfil/actions";
+import { listMyEarnedBadgesAction, listMyPromptContributionsAction, type EarnedBadgeView, type PromptContribution } from "@/app/perfil/actions";
 import { PROFESSIONAL_ROLES } from "@/lib/constants";
 import { COUNTRIES_ES, SPAIN_AUTONOMOUS_COMMUNITIES } from "@/lib/registration-options";
 import { canDevelop, canModerate, LOCAL_USER_KEY, getLocalUser, saveLocalUser, type LocalUser } from "@/lib/local-user";
 import { getProgressToNextLevel } from "@/lib/gamification";
 import { LevelAvatar } from "@/components/LevelAvatar";
-
-interface BadgeDefinition {
-  id: string;
-  name: string;
-  description: string;
-  minXp: number;
-  imageUrl?: string;
-  imageAlt?: string;
-}
-
-const BADGES: BadgeDefinition[] = [
-  {
-    id: "inicio",
-    name: "Primer paso GIANT",
-    description: "Cuenta creada y perfil profesional completo.",
-    minXp: 0,
-    imageUrl: "/giant-logo.png",
-    imageAlt: "Logro GIANT"
-  },
-  { id: "curador", name: "Curador de prompts", description: "Ha guardado y organizado prompts en su biblioteca.", minXp: 80 },
-  { id: "contribuidor", name: "Contribuidor/a", description: "Ha contribuido a la biblioteca de la comunidad.", minXp: 150 },
-  { id: "referente", name: "Referente GIANT", description: "Sus aportes generan uso y reconocimiento.", minXp: 750 }
-];
 
 const LOCAL_ACCOUNT_KEYS = [
   LOCAL_USER_KEY,
@@ -63,6 +40,7 @@ export function ProfileClient() {
   const router = useRouter();
   const [user, setUser] = useState<LocalUser | null>(null);
   const [contributed, setContributed] = useState<PromptContribution[]>([]);
+  const [earnedBadges, setEarnedBadges] = useState<EarnedBadgeView[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [settingsCountry, setSettingsCountry] = useState("España");
   const [settingsRole, setSettingsRole] = useState(PROFESSIONAL_ROLES[0]);
@@ -90,6 +68,9 @@ export function ProfileClient() {
     listMyPromptContributionsAction().then((items) => {
       if (!cancelled) setContributed(items);
     });
+    listMyEarnedBadgesAction().then((items) => {
+      if (!cancelled) setEarnedBadges(items);
+    });
 
     window.addEventListener("giant:user-updated", refreshFromLocal);
     window.addEventListener("storage", refreshFromLocal);
@@ -101,10 +82,9 @@ export function ProfileClient() {
   }, []);
 
   const progress = getProgressToNextLevel(user?.xp ?? 0);
-  const earnedBadges = BADGES.filter((badge) => (user?.xp ?? 0) >= badge.minXp);
   const settingsIsSpain = isSpainCountry(settingsCountry);
 
-  async function shareBadge(badge: BadgeDefinition) {
+  async function shareBadge(badge: EarnedBadgeView) {
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
     canvas.height = 630;
@@ -171,6 +151,7 @@ export function ProfileClient() {
         setSettingsCountry(result.user.country || "España");
         setSettingsRole(result.user.role || PROFESSIONAL_ROLES[0]);
         setContributed(await listMyPromptContributionsAction());
+        setEarnedBadges(await listMyEarnedBadgesAction());
       }
     });
   }
@@ -363,28 +344,32 @@ export function ProfileClient() {
         </div>
       </section>
 
-      <section className="table-panel stack">
-        <div className="section-head compact">
-          <h2>Logros</h2>
-          <span className="badge">{earnedBadges.length}/{BADGES.length}</span>
-        </div>
-        <div className="grid four">
-          {earnedBadges.map((badge) => (
+        <section className="table-panel stack">
+          <div className="section-head compact">
+            <h2>Logros</h2>
+            <span className="badge">{earnedBadges.length} conseguidos</span>
+          </div>
+          <div className="grid four">
+            {earnedBadges.map((badge) => (
             <article className="achievement" key={badge.id}>
               {badge.imageUrl ? (
                 <img className="badge-image" src={badge.imageUrl} alt={badge.imageAlt ?? badge.name} />
               ) : (
                 <Award size={28} />
-              )}
-              <strong>{badge.name}</strong>
-              <p className="muted">{badge.description}</p>
-              <button className="button secondary" type="button" onClick={() => shareBadge(badge)}>
-                <Camera size={16} /> Compartir
-              </button>
-            </article>
-          ))}
-        </div>
-      </section>
+                )}
+                <strong>{badge.name}</strong>
+                <p className="muted">{badge.description}</p>
+                <span className="badge">{badge.criterionLabel}</span>
+                {badge.shareable ? (
+                  <button className="button secondary" type="button" onClick={() => shareBadge(badge)}>
+                    <Camera size={16} /> Compartir
+                  </button>
+                ) : null}
+              </article>
+            ))}
+          </div>
+          {!earnedBadges.length ? <div className="empty-state">Aún no tienes logros desbloqueados.</div> : null}
+        </section>
 
       <section className="table-panel stack">
         <div className="section-head compact">

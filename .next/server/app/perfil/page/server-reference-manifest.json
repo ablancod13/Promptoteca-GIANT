@@ -96,6 +96,18 @@
       "exportedName": "updateProfileAction",
       "filename": "src/app/auth/actions.ts"
     },
+    "0056b6f1eff1c33739b5de65c433587b315be491c0": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 72216,
+          "async": false,
+          "exportedName": "listMyEarnedBadgesAction",
+          "filename": "src/app/perfil/actions.ts"
+        }
+      },
+      "exportedName": "listMyEarnedBadgesAction",
+      "filename": "src/app/perfil/actions.ts"
+    },
     "000794e48274312bdbccd9987c7cc3188c381782a7": {
       "workers": {
         "app/perfil/page": {

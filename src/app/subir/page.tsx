@@ -1,8 +1,8 @@
 import { SubmissionForm } from "@/components/SubmissionForm";
-import { listSubmissionOptions } from "@/lib/repository";
+import { listPopularTags, listSubmissionOptions } from "@/lib/repository";
 
 export default async function SubmitPromptPage() {
-  const options = await listSubmissionOptions();
+  const [options, tags] = await Promise.all([listSubmissionOptions(), listPopularTags()]);
 
   return (
     <main className="page page-narrow">
@@ -11,6 +11,7 @@ export default async function SubmitPromptPage() {
         initialTools={options.tools}
         initialModels={options.models}
         initialModelOptions={options.modelOptions}
+        popularTags={tags}
       />
     </main>
   );

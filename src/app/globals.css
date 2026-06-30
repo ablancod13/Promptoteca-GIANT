@@ -614,6 +614,34 @@ p {
   background: transparent;
 }
 
+.tag-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.tag-chip:hover {
+  border-color: rgba(1, 127, 136, 0.35);
+  color: var(--teal-strong);
+  transform: translateY(-1px);
+}
+
+.tag-chip.selected {
+  border-color: rgba(1, 127, 136, 0.45);
+  background: var(--giant-primary-light);
+  color: var(--teal-strong);
+}
+
 .badge.teal {
   border-color: rgba(15, 118, 110, 0.2);
   background: rgba(15, 118, 110, 0.1);
@@ -1228,6 +1256,22 @@ p {
   object-fit: contain;
   padding: 5px;
   background: white;
+}
+
+.badge-admin-list {
+  display: grid;
+  gap: 10px;
+}
+
+.badge-admin-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #fbfefd;
 }
 
 .taxonomy-grid {

@@ -13,6 +13,7 @@ import {
   type DeveloperUser
 } from "@/app/desarrollador/actions";
 import { DeveloperAboutEditor } from "@/components/DeveloperAboutEditor";
+import { DeveloperBadgeEditor } from "@/components/DeveloperBadgeEditor";
 
 export function DeveloperPanel() {
   const [allowed, setAllowed] = useState<boolean | null>(null);
@@ -102,6 +103,8 @@ export function DeveloperPanel() {
   return (
     <div className="stack">
       <DeveloperAboutEditor />
+
+      <DeveloperBadgeEditor />
 
       <section className="table-panel stack">
         <div className="section-head compact">

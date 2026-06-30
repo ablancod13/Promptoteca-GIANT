@@ -32,6 +32,23 @@ export async function listCategoryNames(): Promise<string[]> {
   return (remote.length ? remote : [...INITIAL_CATEGORIES]).sort((a, b) => a.localeCompare(b, "es"));
 }
 
+export async function listPopularTags(limit = 24): Promise<string[]> {
+  const prompts = await listPrompts();
+  const counts = new Map<string, number>();
+
+  for (const prompt of prompts) {
+    for (const tag of prompt.tags) {
+      const clean = tag.trim();
+      if (clean) counts.set(clean, (counts.get(clean) ?? 0) + 1);
+    }
+  }
+
+  return Array.from(counts)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "es"))
+    .slice(0, limit)
+    .map(([tag]) => tag);
+}
+
 export async function listSubmissionOptions(): Promise<{
   categories: string[];
   tools: string[];

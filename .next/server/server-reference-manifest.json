@@ -864,6 +864,42 @@
       "filename": "src/app/desarrollador/actions.ts",
       "exportedName": "saveAboutContentAction"
     },
+    "40a935ce356e1a7faeab7c0334f8ca5a7002d51a76": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "deleteBadgeDefinitionAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "deleteBadgeDefinitionAction"
+    },
+    "005f3e48d869ce2bbc8755cc0efce939b1d815aa59": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "listBadgeDefinitionsAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "listBadgeDefinitionsAction"
+    },
+    "407f8dbe4d50e852b6338b1c766a858ec331616415": {
+      "workers": {
+        "app/desarrollador/page": {
+          "moduleId": 58084,
+          "async": false,
+          "exportedName": "saveBadgeDefinitionAction",
+          "filename": "src/app/desarrollador/actions.ts"
+        }
+      },
+      "filename": "src/app/desarrollador/actions.ts",
+      "exportedName": "saveBadgeDefinitionAction"
+    },
     "404fb620eeb560d6c27f78d96a38ca5a17493c9e66": {
       "workers": {
         "app/login/page": {
@@ -1115,6 +1151,18 @@
       },
       "filename": "src/app/auth/actions.ts",
       "exportedName": "updateProfileAction"
+    },
+    "0056b6f1eff1c33739b5de65c433587b315be491c0": {
+      "workers": {
+        "app/perfil/page": {
+          "moduleId": 72216,
+          "async": false,
+          "exportedName": "listMyEarnedBadgesAction",
+          "filename": "src/app/perfil/actions.ts"
+        }
+      },
+      "filename": "src/app/perfil/actions.ts",
+      "exportedName": "listMyEarnedBadgesAction"
     },
     "000794e48274312bdbccd9987c7cc3188c381782a7": {
       "workers": {
